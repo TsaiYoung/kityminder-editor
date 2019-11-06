@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>KityMinder Editor - Powered By FEX</title>
+    <title>Collaborative mindmap tool</title>
 
 	<link href="favicon.ico" type="image/x-icon" rel="shortcut icon">
 
@@ -34,10 +34,13 @@
             font-weight: normal;
             padding: 0 20px;
         }
+        .nav-bar{
+			background: #57a3f3
+		}
     </style>
 </head>
 <body ng-app="kityminderDemo" ng-controller="MainController">
-    <h1 class="editor-title">KityMinder Editor - Powered By FEX</h1>
+    <h1 class="editor-title">Collaborative mindmap tool</h1>
     <kityminder-editor on-init="initEditor(editor, minder)"></kityminder-editor>
 </body>
 
@@ -62,13 +65,15 @@
 <script src="node_modules/kityminder-core/dist/kityminder.core.js"></script>
 <script src="bower_components/color-picker/dist/color-picker.js"></script>
 <script src="bower_components/seajs/dist/sea.js"></script>
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/ng-websocket/ng-websocket.js"></script>
 <!-- endbower -->
 
 <script src="ui/kityminder.app.js"></script>
 <script src="ui/service/commandBinder.service.js"></script>
 <script src="ui/service/config.service.js"></script>
 <script src="ui/service/memory.service.js"></script>
-<script src="ui/service/lang.zh-cn.service.js"></script>
+<script src="ui/service/lang.en-us.service.js"></script>
 <script src="ui/service/valueTransfer.service.js"></script>
 <script src="ui/service/minder.service.js"></script>
 <script src="ui/service/resource.service.js"></script>
@@ -103,9 +108,12 @@
 <script src="ui/directive/navigator/navigator.directive.js"></script>
 <script src="ui/directive/searchBox/searchBox.directive.js"></script>
 <script src="ui/directive/searchBtn/searchBtn.directive.js"></script>
+<script src="ui/directive/fileSave/fileSave.directive.js"></script>
+<script src="ui/directive/fileImport/fileImport.directive.js"></script>
 
 
 <script>
+    // 'use strict';
 	angular.module('kityminderDemo', ['kityminderEditor'])
 			.controller('MainController', function($scope) {
 				$scope.initEditor = function(editor, minder) {
@@ -116,4 +124,6 @@
 
 </script>
 
+<script src="ui/socket/collaboration.js"></script>
+<!-- <script src="src/dataImportExport.js"></script> -->
 </html>

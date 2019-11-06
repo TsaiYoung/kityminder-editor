@@ -11,7 +11,8 @@
         <progress-editor minder="minder"></progress-editor>
         <resource-editor minder="minder"></resource-editor>
     </tab>
-    <tab heading="{{ 'appearence' | lang: 'ui/tabs'; }}" ng-click="toggleTopTab('appearance')" select="setCurTab('appearance')">
+    <tab heading="{{ 'appearence' | lang: 'ui/tabs'; }}" ng-click="toggleTopTab('appearance')"
+        select="setCurTab('appearance')">
         <template-list minder="minder" class="inline-directive"></template-list>
         <theme-list minder="minder"></theme-list>
         <layout minder="minder" class="inline-directive"></layout>
@@ -22,5 +23,9 @@
         <expand-level minder="minder"></expand-level>
         <select-all minder="minder"></select-all>
         <search-btn minder="minder"></search-btn>
+    </tab>
+    <tab heading="{{ 'file' | lang: 'ui/tabs'; }}" ng-click="toggleTopTab('file')" select="setCurTab('file')">        
+        <file-import minder="minder"></file-import>
+        <file-save minder="minder"></file-save>
     </tab>
 </tabset>

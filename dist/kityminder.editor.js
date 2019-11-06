@@ -1,6 +1,6 @@
 /*!
  * ====================================================
- * kityminder-editor - v1.0.67 - 2019-02-12
+ * kityminder-editor - v1.0.67 - 2019-11-06
  * https://github.com/fex-team/kityminder-editor
  * GitHub: https://github.com/fex-team/kityminder-editor 
  * Copyright (c) 2019 ; Licensed 
@@ -2099,6 +2099,16 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
   );
 
 
+  $templateCache.put('ui/directive/fileImport/fileImport.html',
+    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default import\" title=\"{{ 'import' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" data-toggle=\"modal\" data-target=\"#importModal\"></button> <button type=\"button\" class=\"btn btn-default import-caption dropdown-toggle\" data-toggle=\"modal\" data-target=\"#importModal\" title=\"{{ 'import' | lang:'ui' }}\"><span class=\"caption\">{{ 'import' | lang:'ui' }}</span> <span class=\"sr-only\">{{ 'import' | lang:'ui' }}</span></button><div class=\"modal fade\" id=\"importModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\" style=\"width: 800px\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Import mind map</h4></div><div class=\"modal-body\" style=\"font-size: 12px\"><div><table class=\"table\" style=\"width: 90%;margin: auto; max-height: 600px;overflow-x: auto\"><caption style=\"font-size: 14px;font-weight: 600;color:#333\">Open mindmap from resource center:</caption><thead><tr><th style=\"width: 20%\">Name</th><th style=\"width: 50%\">Description</th><th style=\"width: 30%\">Operation</th></tr></thead><tbody><tr ng-repeat=\"item in mindmapRes\"><td>{{item.name}}</td><td>{{item.description}}</td><td></td></tr></tbody></table></div><div style=\"width: 90%;margin: auto;margin-top: 30px\"><span style=\"font-size: 14px;font-weight: 600\">Open mindmap from resource center:</span> 导入<input type=\"file\" id=\"fileInput\"></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button> <button type=\"button\" class=\"btn btn-primary\">OK</button></div></div></div></div></div>"
+  );
+
+
+  $templateCache.put('ui/directive/fileSave/fileSave.html',
+    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default save\" title=\"{{ 'save' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" data-toggle=\"modal\" data-target=\"#saveModal\"></button> <button type=\"button\" class=\"btn btn-default save-caption dropdown-toggle\" title=\"{{ 'save' | lang:'ui' }}\" data-toggle=\"modal\" data-target=\"#saveModal\"><span class=\"caption\">{{ 'save' | lang:'ui' }}</span> <span class=\"sr-only\">{{ 'save' | lang:'ui' }}</span></button><div class=\"modal fade\" id=\"saveModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Save mind map</h4></div><div class=\"modal-body\"><div><span style=\"font-size: 16px; margin-right: 20px\">Save the current mind map as format:</span><select class=\"form-control\" style=\"width:100px; display: initial\" id=\"datatypeSelect\"><option>json</option><option>md</option><option>km</option><option>png</option></select></div><div class=\"input-group\" style=\"margin-top: 20px\"><span class=\"input-group-addon\">File name:</span> <input type=\"text\" class=\"form-control\" id=\"mindmapName\" placeholder=\"Please fill in the name\"></div><div style=\"margin-top: 20px\"><button type=\"button\" class=\"btn btn-info\" id=\"saveBtn\" ng-click=\"saveMapFun()\">Save to resource center</button> <button style=\"float: right\" type=\"button\" id=\"downloadBtn\" ng-click=\"downloadMapFun()\" class=\"btn btn-info\">Download</button></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
+  );
+
+
   $templateCache.put('ui/directive/fontOperator/fontOperator.html',
     "<div class=\"font-operator\"><div class=\"dropdown font-family-list\" dropdown><div class=\"dropdown-toggle current-font-item\" dropdown-toggle ng-disabled=\"minder.queryCommandState('fontfamily') === -1\"><a href class=\"current-font-family\" title=\"{{ 'fontfamily' | lang: 'ui' }}\">{{ getFontfamilyName(minder.queryCommandValue('fontfamily')) || '字体' }}</a> <span class=\"caret\"></span></div><ul class=\"dropdown-menu font-list\"><li ng-repeat=\"f in fontFamilyList\" class=\"font-item-wrap\"><a ng-click=\"minder.execCommand('fontfamily', f.val)\" class=\"font-item\" ng-class=\"{ 'font-item-selected' : f == minder.queryCommandValue('fontfamily') }\" ng-style=\"{'font-family': f.val }\">{{ f.name }}</a></li></ul></div><div class=\"dropdown font-size-list\" dropdown><div class=\"dropdown-toggle current-font-item\" dropdown-toggle ng-disabled=\"minder.queryCommandState('fontsize') === -1\"><a href class=\"current-font-size\" title=\"{{ 'fontsize' | lang: 'ui' }}\">{{ minder.queryCommandValue('fontsize') || '字号' }}</a> <span class=\"caret\"></span></div><ul class=\"dropdown-menu font-list\"><li ng-repeat=\"f in fontSizeList\" class=\"font-item-wrap\"><a ng-click=\"minder.execCommand('fontsize', f)\" class=\"font-item\" ng-class=\"{ 'font-item-selected' : f == minder.queryCommandValue('fontsize') }\" ng-style=\"{'font-size': f + 'px'}\">{{ f }}</a></li></ul></div><span class=\"s-btn-icon font-bold\" ng-click=\"minder.queryCommandState('bold') === -1 || minder.execCommand('bold')\" ng-class=\"{'font-bold-selected' : minder.queryCommandState('bold') == 1}\" ng-disabled=\"minder.queryCommandState('bold') === -1\"></span> <span class=\"s-btn-icon font-italics\" ng-click=\"minder.queryCommandState('italic') === -1 || minder.execCommand('italic')\" ng-class=\"{'font-italics-selected' : minder.queryCommandState('italic') == 1}\" ng-disabled=\"minder.queryCommandState('italic') === -1\"></span><div class=\"font-color-wrap\"><span class=\"quick-font-color\" ng-click=\"minder.queryCommandState('forecolor') === -1 || minder.execCommand('forecolor', foreColor)\" ng-disabled=\"minder.queryCommandState('forecolor') === -1\">A</span> <span color-picker class=\"font-color\" set-color=\"setDefaultColor()\" ng-disabled=\"minder.queryCommandState('forecolor') === -1\"><span class=\"caret\"></span></span> <span class=\"font-color-preview\" ng-style=\"{ 'background-color': foreColor }\" ng-click=\"minder.queryCommandState('forecolor') === -1 || minder.execCommand('forecolor', foreColor)\" ng-disabled=\"minder.queryCommandState('forecolor') === -1\"></span></div><color-panel minder=\"minder\" class=\"inline-directive\"></color-panel></div>"
   );
@@ -2130,9 +2140,12 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/navigator/navigator.html',
-    "<div class=\"nav-bar\"><div class=\"nav-btn zoom-in\" ng-click=\"minder.execCommand('zoomIn')\" title=\"{{ 'zoom-in' | lang : 'ui' }}\" ng-class=\"{ 'active' : getZoomRadio(zoom) == 0 }\"><div class=\"icon\"></div></div><div class=\"zoom-pan\"><div class=\"origin\" ng-style=\"{'transform': 'translate(0, ' + getHeight(100) + 'px)'}\" ng-click=\"minder.execCommand('zoom', 100);\"></div><div class=\"indicator\" ng-style=\"{\n" +
-    "             'transform': 'translate(0, ' + getHeight(zoom) + 'px)',\n" +
-    "             'transition': 'transform 200ms'\n" +
+    "<div class=\"nav-bar\"><div class=\"nav-btn zoom-in\" ng-click=\"minder.execCommand('zoomIn')\" title=\"{{ 'zoom-in' | lang : 'ui' }}\" ng-class=\"{ 'active' : getZoomRadio(zoom) == 0 }\"><div class=\"icon\"></div></div><div class=\"zoom-pan\"><div class=\"origin\" ng-style=\"{'transform': 'translate(0, ' + getHeight(100) + 'px)'}\" ng-click=\"minder.execCommand('zoom', 100);\"></div><div class=\"indicator\" ng-style=\"{\r" +
+    "\n" +
+    "             'transform': 'translate(0, ' + getHeight(zoom) + 'px)',\r" +
+    "\n" +
+    "             'transition': 'transform 200ms'\r" +
+    "\n" +
     "             }\"></div></div><div class=\"nav-btn zoom-out\" ng-click=\"minder.execCommand('zoomOut')\" title=\"{{ 'zoom-out' | lang : 'ui' }}\" ng-class=\"{ 'active' : getZoomRadio(zoom) == 1 }\"><div class=\"icon\"></div></div><div class=\"nav-btn hand\" ng-click=\"minder.execCommand('hand')\" title=\"{{ 'hand' | lang : 'ui' }}\" ng-class=\"{ 'active' : minder.queryCommandState('hand') == 1 }\"><div class=\"icon\"></div></div><div class=\"nav-btn camera\" ng-click=\"minder.execCommand('camera', minder.getRoot(), 600);\" title=\"{{ 'camera' | lang : 'ui' }}\"><div class=\"icon\"></div></div><div class=\"nav-btn nav-trigger\" ng-class=\"{'active' : isNavOpen}\" ng-click=\"toggleNavOpen()\" title=\"{{ 'navigator' | lang : 'ui' }}\"><div class=\"icon\"></div></div></div><div class=\"nav-previewer\" ng-show=\"isNavOpen\"></div>"
   );
 
@@ -2143,13 +2156,20 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/noteEditor/noteEditor.html',
-    "<div class=\"panel panel-default\" ng-init=\"noteEditorOpen = false\" ng-show=\"noteEditorOpen\"><div class=\"panel-heading\"><h3 class=\"panel-title\">备注</h3><span>（<a class=\"help\" href=\"https://www.zybuluo.com/techird/note/46064\" target=\"_blank\">支持 GFM 语法书写</a>）</span> <i class=\"close-note-editor glyphicon glyphicon-remove\" ng-click=\"closeNoteEditor()\"></i></div><div class=\"panel-body\"><div ng-show=\"noteEnabled\" ui-codemirror=\"{ onLoad: codemirrorLoaded }\" ng-model=\"noteContent\" ui-codemirror-opts=\"{\n" +
-    "                gfm: true,\n" +
-    "                breaks: true,\n" +
-    "                lineWrapping : true,\n" +
-    "                mode: 'gfm',\n" +
-    "                dragDrop: false,\n" +
-    "                lineNumbers:true\n" +
+    "<div class=\"panel panel-default\" ng-init=\"noteEditorOpen = false\" ng-show=\"noteEditorOpen\"><div class=\"panel-heading\"><h3 class=\"panel-title\">备注</h3><span>（<a class=\"help\" href=\"https://www.zybuluo.com/techird/note/46064\" target=\"_blank\">支持 GFM 语法书写</a>）</span> <i class=\"close-note-editor glyphicon glyphicon-remove\" ng-click=\"closeNoteEditor()\"></i></div><div class=\"panel-body\"><div ng-show=\"noteEnabled\" ui-codemirror=\"{ onLoad: codemirrorLoaded }\" ng-model=\"noteContent\" ui-codemirror-opts=\"{\r" +
+    "\n" +
+    "                gfm: true,\r" +
+    "\n" +
+    "                breaks: true,\r" +
+    "\n" +
+    "                lineWrapping : true,\r" +
+    "\n" +
+    "                mode: 'gfm',\r" +
+    "\n" +
+    "                dragDrop: false,\r" +
+    "\n" +
+    "                lineNumbers:true\r" +
+    "\n" +
     "             }\"></div><p ng-show=\"!noteEnabled\" class=\"km-note-tips\">请选择节点编辑备注</p></div></div>"
   );
 
@@ -2210,7 +2230,7 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/topTab/topTab.html',
-    "<tabset><tab heading=\"{{ 'idea' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('idea')\" select=\"setCurTab('idea')\"><undo-redo editor=\"editor\"></undo-redo><append-node minder=\"minder\"></append-node><arrange minder=\"minder\"></arrange><operation minder=\"minder\"></operation><hyper-link minder=\"minder\"></hyper-link><image-btn minder=\"minder\"></image-btn><note-btn minder=\"minder\"></note-btn><priority-editor minder=\"minder\"></priority-editor><progress-editor minder=\"minder\"></progress-editor><resource-editor minder=\"minder\"></resource-editor></tab><tab heading=\"{{ 'appearence' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('appearance')\" select=\"setCurTab('appearance')\"><template-list minder=\"minder\" class=\"inline-directive\"></template-list><theme-list minder=\"minder\"></theme-list><layout minder=\"minder\" class=\"inline-directive\"></layout><style-operator minder=\"minder\" class=\"inline-directive\"></style-operator><font-operator minder=\"minder\" class=\"inline-directive\"></font-operator></tab><tab heading=\"{{ 'view' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('view')\" select=\"setCurTab('view')\"><expand-level minder=\"minder\"></expand-level><select-all minder=\"minder\"></select-all><search-btn minder=\"minder\"></search-btn></tab></tabset>"
+    "<tabset><tab heading=\"{{ 'idea' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('idea')\" select=\"setCurTab('idea')\"><undo-redo editor=\"editor\"></undo-redo><append-node minder=\"minder\"></append-node><arrange minder=\"minder\"></arrange><operation minder=\"minder\"></operation><hyper-link minder=\"minder\"></hyper-link><image-btn minder=\"minder\"></image-btn><note-btn minder=\"minder\"></note-btn><priority-editor minder=\"minder\"></priority-editor><progress-editor minder=\"minder\"></progress-editor><resource-editor minder=\"minder\"></resource-editor></tab><tab heading=\"{{ 'appearence' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('appearance')\" select=\"setCurTab('appearance')\"><template-list minder=\"minder\" class=\"inline-directive\"></template-list><theme-list minder=\"minder\"></theme-list><layout minder=\"minder\" class=\"inline-directive\"></layout><style-operator minder=\"minder\" class=\"inline-directive\"></style-operator><font-operator minder=\"minder\" class=\"inline-directive\"></font-operator></tab><tab heading=\"{{ 'view' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('view')\" select=\"setCurTab('view')\"><expand-level minder=\"minder\"></expand-level><select-all minder=\"minder\"></select-all><search-btn minder=\"minder\"></search-btn></tab><tab heading=\"{{ 'file' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('file')\" select=\"setCurTab('file')\"><file-import minder=\"minder\"></file-import><file-save minder=\"minder\"></file-save></tab></tabset>"
   );
 
 
@@ -2225,7 +2245,8 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/dialog/imExportNode/imExportNode.tpl.html',
-    "<div class=\"modal-header\"><h3 class=\"modal-title\">{{ title }}</h3></div><div class=\"modal-body\"><textarea type=\"text\" class=\"form-control single-input\" rows=\"8\" ng-keydown=\"shortCut($event);\" ng-model=\"value\" ng-readonly=\"type === 'export'\">\n" +
+    "<div class=\"modal-header\"><h3 class=\"modal-title\">{{ title }}</h3></div><div class=\"modal-body\"><textarea type=\"text\" class=\"form-control single-input\" rows=\"8\" ng-keydown=\"shortCut($event);\" ng-model=\"value\" ng-readonly=\"type === 'export'\">\r" +
+    "\n" +
     "    </textarea></div><div class=\"modal-footer\"><button class=\"btn btn-primary\" ng-click=\"ok()\" ng-disabled=\"type === 'import' && value == ''\">OK</button> <button class=\"btn btn-warning\" ng-click=\"cancel()\">Cancel</button></div>"
   );
 
@@ -2314,6 +2335,434 @@ angular.module('kityminderEditor')
 				}
 
 			};
+		}
+	});
+angular.module('kityminderEditor')
+	.service('lang.zh-cn', function() {
+		return {
+			'zh-cn': {
+				'template': {
+					'default': 'Mind map',
+					'tianpan': 'Spiral map',
+					'structure': 'Structure chart',
+					'filetree': 'Content chart',
+					'right': 'Tree',
+					'fish-bone': 'Fish-bone figure'
+				},
+				'theme': {
+					'classic': 'Normal',
+					'classic-compact': 'Compact',
+					'snow': 'Snow',
+					'snow-compact': 'Compact',
+					'fish': 'Fish',
+					'wire': 'Wire',
+					'fresh-red': 'Normal',
+					'fresh-soil': 'Normal',
+					'fresh-green': 'Normal',
+					'fresh-blue': 'Normal',
+					'fresh-purple': 'Normal',
+					'fresh-pink': 'Normal',
+					'fresh-red-compat': 'Compact',
+					'fresh-soil-compat': 'Compact',
+					'fresh-green-compat': 'Compact',
+					'fresh-blue-compat': 'Compact',
+					'fresh-purple-compat': 'Compact',
+					'fresh-pink-compat': 'Compact',
+					'tianpan':'Normal',
+					'tianpan-compact': 'Compact'
+				},
+				'maintopic': 'Main topic',
+				'topic': 'Topic',
+				'panels': {
+					'history': 'History',
+					'template': 'Template',
+					'theme': 'Theme',
+					'layout': 'Layout',
+					'style': 'Style',
+					'font': 'Font',
+					'color': 'Color',
+					'background': 'Background',
+					'insert': 'Insert',
+					'arrange': 'Arrange',
+					'nodeop': 'Current',
+					'priority': 'Priority',
+					'progress': 'Progress',
+					'resource': 'Resource',
+					'note': 'Note',
+					'attachment': 'Attachment',
+					'word': 'Word'
+				},
+				'error_message': {
+				// 	'title': '哎呀，脑图出错了',
+
+				// 	'err_load': '加载脑图失败',
+				// 	'err_save': '保存脑图失败',
+				// 	'err_network': '网络错误',
+				// 	'err_doc_resolve': '文档解析失败',
+				// 	'err_unknown': '发生了奇怪的错误',
+				// 	'err_localfile_read': '文件读取错误',
+				// 	'err_download': '文件下载失败',
+				// 	'err_remove_share': '取消分享失败',
+				// 	'err_create_share': '分享失败',
+				// 	'err_mkdir': '目录创建失败',
+				// 	'err_ls': '读取目录失败',
+				// 	'err_share_data': '加载分享内容出错',
+				// 	'err_share_sync_fail': '分享内容同步失败',
+				// 	'err_move_file': '文件移动失败',
+				// 	'err_rename': '重命名失败',
+
+				// 	'unknownreason': '可能是外星人篡改了代码...',
+				// 	'pcs_code': {
+				// 		3: "不支持此接口",
+				// 		4: "没有权限执行此操作",
+				// 		5: "IP未授权",
+				// 		110: "用户会话已过期，请重新登录",
+				// 		31001: "数据库查询错误",
+				// 		31002: "数据库连接错误",
+				// 		31003: "数据库返回空结果",
+				// 		31021: "网络错误",
+				// 		31022: "暂时无法连接服务器",
+				// 		31023: "输入参数错误",
+				// 		31024: "app id为空",
+				// 		31025: "后端存储错误",
+				// 		31041: "用户的cookie不是合法的百度cookie",
+				// 		31042: "用户未登陆",
+				// 		31043: "用户未激活",
+				// 		31044: "用户未授权",
+				// 		31045: "用户不存在",
+				// 		31046: "用户已经存在",
+				// 		31061: "文件已经存在",
+				// 		31062: "文件名非法",
+				// 		31063: "文件父目录不存在",
+				// 		31064: "无权访问此文件",
+				// 		31065: "目录已满",
+				// 		31066: "文件不存在",
+				// 		31067: "文件处理出错",
+				// 		31068: "文件创建失败",
+				// 		31069: "文件拷贝失败",
+				// 		31070: "文件删除失败",
+				// 		31071: "不能读取文件元信息",
+				// 		31072: "文件移动失败",
+				// 		31073: "文件重命名失败",
+				// 		31079: "未找到文件MD5，请使用上传API上传整个文件。",
+				// 		31081: "superfile创建失败",
+				// 		31082: "superfile 块列表为空",
+				// 		31083: "superfile 更新失败",
+				// 		31101: "tag系统内部错误",
+				// 		31102: "tag参数错误",
+				// 		31103: "tag系统错误",
+				// 		31110: "未授权设置此目录配额",
+				// 		31111: "配额管理只支持两级目录",
+				// 		31112: "超出配额",
+				// 		31113: "配额不能超出目录祖先的配额",
+				// 		31114: "配额不能比子目录配额小",
+				// 		31141: "请求缩略图服务失败",
+				// 		31201: "签名错误",
+				// 		31202: "文件不存在",
+				// 		31203: "设置acl失败",
+				// 		31204: "请求acl验证失败",
+				// 		31205: "获取acl失败",
+				// 		31206: "acl不存在",
+				// 		31207: "bucket已存在",
+				// 		31208: "用户请求错误",
+				// 		31209: "服务器错误",
+				// 		31210: "服务器不支持",
+				// 		31211: "禁止访问",
+				// 		31212: "服务不可用",
+				// 		31213: "重试出错",
+				// 		31214: "上传文件data失败",
+				// 		31215: "上传文件meta失败",
+				// 		31216: "下载文件data失败",
+				// 		31217: "下载文件meta失败",
+				// 		31218: "容量超出限额",
+				// 		31219: "请求数超出限额",
+				// 		31220: "流量超出限额",
+				// 		31298: "服务器返回值KEY非法",
+				// 		31299: "服务器返回值KEY不存在"
+				// 	}
+				},
+				'ui': {
+					// 'shared_file_title': '[分享的] {0} (只读)',
+					// 'load_share_for_edit': '正在加载分享的文件...',
+					// 'share_sync_success': '分享内容已同步',
+					// 'recycle_clear_confirm': '确认清空回收站么？清空后的文件无法恢复。',
+
+					// 'fullscreen_exit_hint': '按 Esc 或 F11 退出全屏',
+
+					// 'error_detail': '详细信息',
+					// 'copy_and_feedback': '复制并反馈',
+					// 'move_file_confirm': '确定把 "{0}" 移动到 "{1}" 吗？',
+					// 'rename': '重命名',
+					// 'rename_success': '{0} 重命名成功',
+					// 'move_success': '{0} 移动成功到 {1}',
+
+					'command': {
+						'appendsiblingnode': 'Sibling node',
+                        'appendparentnode': 'Parent node',
+						'appendchildnode': 'Child node',
+						'removenode': 'Remove',
+						'editnode': 'Edit',
+						'arrangeup': 'Up',
+						'arrangedown': 'Down',
+						'resetlayout': 'Reset',
+						'expandtoleaf': 'Expand all',
+						'expandtolevel1': 'Expand to level1',
+						'expandtolevel2': 'Expand to level2',
+						'expandtolevel3': 'Expand to level3',
+						'expandtolevel4': 'Expand to level4',
+						'expandtolevel5': 'Expand to level5',
+						'expandtolevel6': 'Expand to level6',
+						'fullscreen': 'Fullscreen',
+						'outline': 'Outline'
+					},
+
+					'search':'Search',
+
+					'save':'Save',
+					
+					'import':'Import',
+
+					'expandtoleaf': 'Expand',
+
+					'back': 'Back',
+
+					'undo': 'Undo (Ctrl + Z)',
+					'redo': 'Redo (Ctrl + Y)',
+
+					'tabs': {
+						'file':'File',
+						'idea': 'Idea',
+						'appearence': 'Appearence',
+						'view': 'View'
+					},
+
+					'quickvisit': {
+						'new': 'New (Ctrl + Alt + N)',
+						'save': 'Save (Ctrl + S)',
+						'share': 'Share (Ctrl + Alt + S)',
+						'feedback': 'Feedback（F1）',
+						'editshare': 'Edit'
+					},
+
+					'menu': {
+
+						// 'mainmenutext': '百度脑图', // 主菜单按钮文本
+
+						// 'newtab': '新建',
+						// 'opentab': '打开',
+						// 'savetab': '保存',
+						// 'sharetab': '分享',
+						// 'preferencetab': '设置',
+						// 'helptab': '帮助',
+						// 'feedbacktab': '反馈',
+						// 'recenttab': '最近使用',
+						// 'netdisktab': '百度云存储',
+						// 'localtab': '本地文件',
+						// 'drafttab': '草稿箱',
+						// 'downloadtab': '导出到本地',
+						// 'createsharetab': '当前脑图',
+						// 'managesharetab': '已分享',
+
+						// 'newheader': '新建脑图',
+						// 'openheader': '打开',
+						// 'saveheader': '保存到',
+						// 'draftheader': '草稿箱',
+						// 'shareheader': '分享我的脑图',
+						// 'downloadheader': '导出到指定格式',
+						// 'preferenceheader': '偏好设置',
+						// 'helpheader': '帮助',
+						// 'feedbackheader': '反馈'
+					},
+
+					// 'mydocument': '我的文档',
+					// 'emptydir': '目录为空！',
+					// 'pickfile': '选择文件...',
+					// 'acceptfile': '支持的格式：{0}',
+					// 'dropfile': '或将文件拖至此处',
+					// 'unsupportedfile': '不支持的文件格式',
+					// 'untitleddoc': '未命名文档',
+					// 'overrideconfirm': '{0} 已存在，确认覆盖吗？',
+					// 'checklogin': '检查登录状态中...',
+					// 'loggingin': '正在登录...',
+					// 'recent': '最近打开',
+					// 'clearrecent': '清空',
+					// 'clearrecentconfirm': '确认清空最近文档列表？',
+					// 'cleardraft': '清空',
+					// 'cleardraftconfirm': '确认清空草稿箱？',
+
+					// 'none_share': '不分享',
+					// 'public_share': '公开分享',
+					// 'password_share': '私密分享',
+					// 'email_share': '邮件邀请',
+					// 'url_share': '脑图 URL 地址：',
+					// 'sns_share': '社交网络分享：',
+					// 'sns_share_text': '“{0}” - 我用百度脑图制作的思维导图，快看看吧！（地址：{1}）',
+					// 'none_share_description': '不分享当前脑图',
+					// 'public_share_description': '创建任何人可见的分享',
+					// 'share_button_text': '创建',
+					// 'password_share_description': '创建需要密码才可见的分享',
+					// 'email_share_description': '创建指定人可见的分享，您还可以允许他们编辑',
+					// 'ondev': '敬请期待！',
+					// 'create_share_failed': '分享失败：{0}',
+					// 'remove_share_failed': '删除失败：{1}',
+					// 'copy': '复制',
+					// 'copied': '已复制',
+					// 'shared_tip': '当前脑图被 {0}  分享，你可以修改之后保存到自己的网盘上或再次分享',
+					// 'current_share': '当前脑图',
+					// 'manage_share': '我的分享',
+					// 'share_remove_action': '不分享该脑图',
+					// 'share_view_action': '打开分享地址',
+					// 'share_edit_action': '编辑分享的文件',
+
+					// 'login': '登录',
+					// 'logout': '注销',
+					// 'switchuser': '切换账户',
+					// 'userinfo': '个人信息',
+					// 'gotonetdisk': '我的网盘',
+					// 'requirelogin': '请 <a class="login-button">登录</a> 后使用',
+					// 'saveas': '保存为',
+					// 'filename': '文件名',
+					// 'fileformat': '保存格式',
+					// 'save': '保存',
+					// 'mkdir': '新建目录',
+					// 'recycle': '回收站',
+					// 'newdir': '未命名目录',
+
+					'bold': 'Bold',
+					'italic': 'Italic',
+					'forecolor': 'Color',
+					'fontfamily': 'Font family',
+					'fontsize': 'Font size',
+					'layoutstyle': 'Style',
+					'node': 'Node',
+					'saveto': 'Save as',
+					'hand': 'Drag',
+					'camera': 'Position',
+					'zoom-in': 'Zoom in (Ctrl+)',
+					'zoom-out': 'Zoom out(Ctrl-)',
+					'markers': 'Markers',
+					'resource': 'Resources',
+					'help': 'Help',
+					'preference': 'Preference',
+					'expandnode': 'Expand',
+					'collapsenode': 'Collapse',
+					'template': 'Template',
+					'theme': 'Theme',
+					'clearstyle': 'Clear',
+					'copystyle': 'Copy style',
+					'pastestyle': 'Paste style',
+					'appendsiblingnode': 'Sibling node',
+					'appendchildnode': 'Child node',
+					'arrangeup': 'Up',
+					'arrangedown': 'Down',
+					'editnode': 'Edit',
+					'removenode': 'Remove',
+					'priority': 'Priority',
+					'progress': {
+						'p1': 'Progress: 0',
+						'p2': 'Progress: 1/8',
+						'p3': 'Progress: 1/4',
+						'p4': 'Progress: 3/8',
+						'p5': 'Progress:',
+						'p6': 'Progress: 5/8',
+						'p7': 'Progress: 3/4',
+						'p8': 'Progress: 7/8',
+						'p9': 'Progress: 1',
+						'p0': 'Clear'
+					},
+					'link': 'Links',
+					'image': 'Images',
+					'note': 'Notes',
+                    'insertlink': 'Insert link',
+                    'insertimage': 'Insert image',
+                    'insertnote': 'Insert note',
+					'removelink': 'Remove link',
+					'removeimage': 'Remove image',
+					'removenote': 'Remove note',
+					'resetlayout': 'Reset layout',
+
+					// 'justnow': '刚刚',
+					// 'minutesago': '{0} 分钟前',
+					// 'hoursago': '{0} 小时前',
+					// 'yesterday': '昨天',
+					// 'daysago': '{0} 天前',
+					// 'longago': '很久之前',
+
+					// 'redirect': '您正在打开连接 {0}，百度脑图不能保证连接的安全性，是否要继续？',
+					// 'navigator': '导航器',
+
+					// 'unsavedcontent': '当前文件还没有保存到网盘：\n\n{0}\n\n虽然未保存的数据会缓存在草稿箱，但是清除浏览器缓存会导致草稿箱清除。',
+
+					// 'shortcuts': '快捷键',
+					// 'contact': '联系与反馈',
+					// 'email': '邮件组',
+					// 'qq_group': 'QQ 群',
+					// 'github_issue': 'Github',
+					// 'baidu_tieba': '贴吧',
+
+					// 'clipboardunsupported': '您的浏览器不支持剪贴板，请使用快捷键复制',
+
+					// 'load_success': '{0} 加载成功',
+					// 'save_success': '{0} 已保存于 {1}',
+					// 'autosave_success': '{0} 已自动保存于 {1}',
+
+					'selectall': 'Select all',
+					'selectrevert': 'Invert selection',
+					'selectsiblings': 'Select sibling node',
+					'selectlevel': 'Select peer node',
+					'selectpath': 'Select path',
+					'selecttree': 'Select subtree'
+				},
+				'popupcolor': {
+					'clearColor': 'Clear color',
+					'standardColor': 'Standard color',
+					'themeColor': 'Theme Color'
+				},
+				'dialogs': {
+					'markers': {
+						'static': {
+							'lang_input_text': 'Text:',
+							'lang_input_url': 'Url:',
+							'lang_input_title': 'Title：',
+							'lang_input_target': 'Target:'
+						},
+						'priority': 'Priority',
+						'none': 'None',
+						'progress': {
+							'title': 'Progress',
+							'notdone': 'Undone',
+							'done1': 'Done 1/8',
+							'done2': 'Done 1/4',
+							'done3': 'Done 3/8',
+							'done4': 'Done 1/2',
+							'done5': 'Done 5/8',
+							'done6': 'Done 3/4',
+							'done7': 'Done 7/8',
+							'done': 'Done'
+						}
+					},
+					'help': {
+
+					},
+					'hyperlink': {},
+					'image': {},
+					'resource': {}
+				},
+				'hyperlink': {
+					'hyperlink': 'Link...',
+					'unhyperlink': 'Remove link'
+				},
+				'image': {
+					'image': 'Image...',
+					'removeimage': 'Remove image'
+				},
+				'marker': {
+					'marker': 'Progress/priority...'
+				},
+				'resource': {
+					'resource': 'Resource...'
+				}
+			}
 		}
 	});
 angular.module('kityminderEditor')
@@ -3362,6 +3811,143 @@ angular.module('kityminderEditor')
             link: function($scope) {
 
                 $scope.levels = [1, 2, 3, 4, 5, 6];
+            }
+        }
+    });
+angular.module('kityminderEditor')
+    .directive('fileImport', function() {
+        return {
+            restrict: 'E',
+            templateUrl: 'ui/directive/fileImport/fileImport.html',
+            scope: {
+                minder: '='
+            },
+            replace: true,
+            link: function (scope) {
+            }            
+        }
+    });
+angular.module('kityminderEditor')
+    .directive('fileSave', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'ui/directive/fileSave/fileSave.html',
+            scope: {
+                minder: '='
+            },
+            replace: true,
+            link: function (scope) {
+                scope.saveMapFun = saveMapFun;
+                scope.downloadMapFun = downloadMapFun;
+
+                function saveMapFun() {
+                    if ($('#mindmapName').val() != "" && $('#mindmapName').val() != undefined) {
+                        var datatype = $('#datatypeSelect').val();
+
+                        switch (datatype) {
+                            case 'km':
+                                exportType = 'json';
+                                break;
+                            case 'md':
+                                exportType = 'markdown';
+                                break;
+                            default:
+                                exportType = datatype;
+                                break;
+                        }
+
+                        editor.minder.exportData(exportType).then(function (content) {
+
+                            // 文件上传
+                            var blob = new Blob([content]);
+                            var filename = $('#mindmapName').val() + '.' + datatype;
+                            var fileBlob = new File([blob], filename);
+
+                            var formData = new FormData();
+                            formData.append("file", fileBlob);
+                            formData.append("description", "Collaborative mindmap tool");
+                            formData.append("type", "others");
+                            formData.append("uploaderId", "7fcc54b5-9000-4308-a458-82cc590b80b1");
+                            formData.append("privacy", "private");
+                            formData.append("folderId", "7a3b61c2-1d6d-4791-a004-c2cce9547210");
+
+                            try {
+                                $.ajax({
+                                    url: 'http://localhost:8081/GeoProblemSolving/folder/uploadToFolder',
+                                    type: "POST",
+                                    data: formData,
+                                    processData: false,
+                                    contentType: false,
+                                    success: function (data) {
+                                        if (data == "Size over" || data == "Fail" || data == "Offline") {
+                                            console.log(data);
+                                        }
+                                        else if (data.uploaded.length > 0) {
+                                            console.log("success!");
+                                        }
+                                    },
+                                    error: function (err) {
+                                        console.log("fail.");
+                                    }
+                                });
+                            }
+                            catch (ex) {
+                                console.log("fail")
+                            }
+
+                        });
+                    }
+                    else {
+
+                    }
+                }
+
+                function downloadMapFun() {
+                    if ($('#mindmapName').val() != "" && $('#mindmapName').val() != undefined) {
+                        var datatype = $('#datatypeSelect').val();
+
+                        switch (datatype) {
+                            case 'km':
+                                exportType = 'json';
+                                break;
+                            case 'md':
+                                exportType = 'markdown';
+                                break;
+                            default:
+                                exportType = datatype;
+                                break;
+                        }
+
+                        editor.minder.exportData(exportType).then(function (content) {
+
+                            // 文件下载
+                            if (datatype == "png") {
+                                var arr = content.split(','), mime = arr[0].match(/:(.*?);/)[1],
+                                    bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+                                while (n--) {
+                                    u8arr[n] = bstr.charCodeAt(n);
+                                }
+
+                                var blob = new Blob([u8arr], { type: mime }),
+                                    url = URL.createObjectURL(blob);
+                            }
+                            else {
+                                var blob = new Blob([content]),
+                                    url = URL.createObjectURL(blob);
+                            }
+
+                            var a = document.createElement("a");
+                            a.download = $('#mindmapName').val() + '.' + datatype;
+                            a.href = url;
+                            $("body").append(a);
+                            a.click();
+                            $(a).remove();
+                        });
+                    }
+                    else {
+
+                    }
+                }
             }
         }
     });

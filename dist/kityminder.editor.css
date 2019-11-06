@@ -198,7 +198,7 @@ div.minder-editor-container {
   background-position: 0 -40px;
 }
 .arrange-group {
-  width: 64px;
+  width: 70px;
 }
 .arrange-up .km-btn-icon {
   background-position: 0 -280px;
@@ -207,7 +207,7 @@ div.minder-editor-container {
   background-position: 0 -300px;
 }
 .operation-group {
-  width: 64px;
+  width: 90px;
 }
 .edit-node .km-btn-icon {
   background-position: 0 -60px;
@@ -221,7 +221,7 @@ div.minder-editor-container {
 }
 .btn-group-vertical .hyperlink,
 .btn-group-vertical .hyperlink-caption {
-  width: 40px;
+  width: 50px;
   margin: 0;
   padding: 0;
   border: none!important;
@@ -255,7 +255,7 @@ div.minder-editor-container {
 }
 .btn-group-vertical .image-btn,
 .btn-group-vertical .image-btn-caption {
-  width: 40px;
+  width: 50px;
   margin: 0;
   padding: 0;
   border: none!important;
@@ -373,7 +373,7 @@ div.minder-editor-container {
 }
 .btn-group-vertical .note-btn,
 .btn-group-vertical .note-btn-caption {
-  width: 40px;
+  width: 50px;
   margin: 0;
   padding: 0;
   border: none!important;
@@ -932,6 +932,7 @@ div a.theme-item {
 }
 .btn-label {
   font-size: 12px;
+  margin-left: 10px;
 }
 .btn-wrap {
   width: 50px;
@@ -1241,7 +1242,7 @@ div a.theme-item {
 }
 .btn-group-vertical .expand,
 .btn-group-vertical .expand-caption {
-  width: 40px;
+  width: 56px;
   margin: 0;
   padding: 0;
   border: none!important;
@@ -1277,8 +1278,8 @@ div a.theme-item {
 }
 .btn-group-vertical .select,
 .btn-group-vertical .select-caption {
-  width: 40px;
-  margin: 0;
+  width: 56px;
+  margin-left: 10px;
   padding: 0;
   border: none!important;
   border-radius: 0!important;
@@ -1312,7 +1313,7 @@ div a.theme-item {
 }
 .btn-group-vertical .search,
 .btn-group-vertical .search-caption {
-  width: 40px;
+  width: 56px;
   margin: 0;
   padding: 0;
   border: none!important;
@@ -1340,6 +1341,78 @@ div a.theme-item {
   height: 20px;
 }
 .btn-group-vertical .search-caption .caption {
+  font-size: 12px;
+}
+.btn-group-vertical {
+  vertical-align: middle;
+  margin: 5px;
+}
+.btn-group-vertical .save,
+.btn-group-vertical .save-caption {
+  width: 56px;
+  margin: 0;
+  padding: 0;
+  border: none!important;
+  border-radius: 0!important;
+}
+.btn-group-vertical .save:hover,
+.btn-group-vertical .save-caption:hover {
+  background-color: #eff3fa;
+}
+.btn-group-vertical .save:active,
+.btn-group-vertical .save-caption:active {
+  background-color: #c4d0ee;
+}
+.btn-group-vertical .save.active,
+.btn-group-vertical .save-caption.active {
+  box-shadow: none;
+  background-color: #eff3fa;
+}
+.btn-group-vertical .save {
+  height: 25px;
+  background: url(images/icons.png) no-repeat 0 -920px;
+  background-position-x: 50%;
+}
+.btn-group-vertical .save-caption {
+  height: 20px;
+}
+.btn-group-vertical .save-caption .caption {
+  font-size: 12px;
+}
+.btn-group-vertical {
+  vertical-align: middle;
+  margin: 5px;
+}
+.btn-group-vertical .import,
+.btn-group-vertical .import-caption {
+  width: 56px;
+  margin: 0;
+  padding: 0;
+  border: none!important;
+  border-radius: 0!important;
+}
+.btn-group-vertical .import:hover,
+.btn-group-vertical .import-caption:hover {
+  background-color: #eff3fa;
+}
+.btn-group-vertical .import:active,
+.btn-group-vertical .import-caption:active {
+  background-color: #c4d0ee;
+}
+.btn-group-vertical .import.active,
+.btn-group-vertical .import-caption.active {
+  box-shadow: none;
+  background-color: #eff3fa;
+}
+.btn-group-vertical .import {
+  height: 25px;
+  background: url(images/icons.png) no-repeat 0 -895px;
+  background-position-x: 50%;
+}
+.btn-group-vertical .import-caption {
+  height: 20px;
+}
+.btn-group-vertical .import-caption .caption {
   font-size: 12px;
 }
 .search-box {

@@ -1,0 +1,52 @@
+<div class="btn-group-vertical" dropdown is-open="isopen">
+        <button type="button" class="btn btn-default save" title="{{ 'save' | lang:'ui' }}"
+                ng-class="{'active': isopen}" data-toggle="modal" data-target="#saveModal"></button>
+        <button type="button" class="btn btn-default save-caption dropdown-toggle" title="{{ 'save' | lang:'ui' }}"
+                data-toggle="modal" data-target="#saveModal">
+                <span class="caption">{{ 'save' | lang:'ui' }}</span>
+                <span class="sr-only">{{ 'save' | lang:'ui' }}</span>
+        </button>
+        <!-- 模态框（Modal） -->
+        <div class="modal fade" id="saveModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                        <div class="modal-content">
+                                <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                &times;
+                                        </button>
+                                        <h4 class="modal-title" id="myModalLabel">
+                                                Save mind map
+                                        </h4>
+                                </div>
+                                <div class="modal-body">
+                                        <div>
+                                                <span style="font-size: 16px; margin-right: 20px; ">Save
+                                                        the current mind map as format: </span>
+                                                <select class="form-control" style="width:100px; display: initial;" id="datatypeSelect">
+                                                        <option>json</option>
+                                                        <option>md</option>
+                                                        <option>km</option>
+                                                        <option>png</option>
+                                                </select>
+                                        </div>
+                                        <div class="input-group" style="margin-top: 20px;">
+                                                <span class="input-group-addon"> File name: </span>
+                                                <input type="text" class="form-control" id="mindmapName"
+                                                        placeholder="Please fill in the name">
+                                        </div>
+                                        <div style="margin-top: 20px;">
+                                                <button type="button" class="btn btn-info" id="saveBtn" ng-click="saveMapFun()">
+                                                        Save to resource center</button>
+                                                <button style="float: right;" type="button" id="downloadBtn" ng-click="downloadMapFun()"
+                                                        class="btn btn-info">Download</button>
+                                        </div>
+                                </div>
+                                <div class="modal-footer">
+                                        <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">Close</button>
+                                </div>
+                        </div>
+                </div>
+        </div>
+</div>
