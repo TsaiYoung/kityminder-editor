@@ -28,4 +28,4 @@ KityMinder Editor 是一款强大、简洁、体验优秀的脑图编辑工具�
 
 ## 详情见
 
-[Github issues](https://github.com/fex-team/kityminder-editor)
+[KityMinder Editor Github](https://github.com/fex-team/kityminder-editor)
