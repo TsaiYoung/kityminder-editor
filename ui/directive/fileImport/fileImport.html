@@ -8,7 +8,7 @@
     </button>
     <!-- 模态框（Modal） -->
     <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-        aria-hidden="true">
+        aria-hidden="true" ng-controller="mapImportCtrl">
         <div class="modal-dialog" style="width: 800px;">
             <div class="modal-content">
                 <div class="modal-header">
@@ -20,35 +20,40 @@
                     </h4>
                 </div>
                 <div class="modal-body" style="font-size: 12px">
-                    <div>
-                        <table class="table" style="width: 90%;margin: auto; max-height: 600px;overflow-x: auto;">
-                            <caption style="font-size: 14px;font-weight: 600;color:#333; ">Open mindmap from resource center: </caption>
+                    <div style="width: 95%; margin: auto; border: 1px solid gray;">
+                        <table class="table" style="width: 90%; margin: auto;">
+                            <caption style="font-size: 14px;font-weight: 600;color:#333; ">Open mindmap from resource
+                                center: </caption>
                             <thead>
                                 <tr>
-                                    <th style="width: 20%;">Name</th>
+                                    <th style="width: 30%;">Name</th>
                                     <th style="width: 50%;">Description</th>
-                                    <th style="width: 30%;">Operation</th>
+                                    <th style="width: 20%;">Operation</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr ng-repeat="item in mindmapRes">
-                                    <td>{{item.name}}</td>
-                                    <td>{{item.description}}</td>
-                                    <td></td>
-                                </tr>
-                            </tbody>
                         </table>
+                        <div style="min-height:100px;max-height: 400px; overflow-y: auto;">
+                            <table class="table" style="width: 90%;margin: auto;">
+                                <tbody>
+                                    <tr ng-repeat="item in mindmapRes">
+                                        <td style="width: 30%;">{{item.name}}</td>
+                                        <td style="width: 50%;">{{item.description}}</td>
+                                        <td style="width: 20%;"><span style="cursor:pointer"
+                                                class="glyphicon glyphicon-ok-circle" title="Load this mindmap"
+                                                ng-click="mapLoad(item)"></span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div style="width: 90%;margin: auto;margin-top: 30px;">
+                    <div style="width: 90%; margin: auto;margin-top: 30px;">
                         <span style="font-size: 14px;font-weight: 600; ">Open mindmap from resource center: </span>
-                        导入<input type="file" id="fileInput">
+                        <input type="file" id="fileInput" style="margin-top: 15px;"><button type="button"
+                            class="btn btn-info" style="margin-top: 15px;" ng-click="mapImport()">Upload</button>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close
-                    </button>
-                    <button type="button" class="btn btn-primary">
-                        OK
                     </button>
                 </div>
             </div>

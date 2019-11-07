@@ -1,28 +1,31 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Collaborative mindmap tool</title>
 
-	<link href="favicon.ico" type="image/x-icon" rel="shortcut icon">
+    <link href="favicon.ico" type="image/x-icon" rel="shortcut icon">
 
-	<!-- bower:css -->
+    <!-- bower:css -->
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="bower_components/codemirror/lib/codemirror.css" />
     <link rel="stylesheet" href="bower_components/hotbox/hotbox.css" />
     <link rel="stylesheet" href="node_modules/kityminder-core/dist/kityminder.core.css" />
     <link rel="stylesheet" href="bower_components/color-picker/dist/color-picker.css" />
-	<!-- endbower -->
+    <!-- endbower -->
 
-	<link rel="stylesheet" href="dist/kityminder.editor.css">
+    <link rel="stylesheet" href="dist/kityminder.editor.css">
 
     <style>
-        html, body {
+        html,
+        body {
             margin: 0;
             padding: 0;
             height: 100%;
             overflow: hidden;
         }
+
         h1.editor-title {
             background: #393F4F;
             color: white;
@@ -34,11 +37,13 @@
             font-weight: normal;
             padding: 0 20px;
         }
-        .nav-bar{
-			background: #57a3f3
-		}
+
+        .nav-bar {
+            background: #57a3f3
+        }
     </style>
 </head>
+
 <body ng-app="kityminderDemo" ng-controller="MainController">
     <h1 class="editor-title">Collaborative mindmap tool</h1>
     <kityminder-editor on-init="initEditor(editor, minder)"></kityminder-editor>
@@ -66,7 +71,7 @@
 <script src="bower_components/color-picker/dist/color-picker.js"></script>
 <script src="bower_components/seajs/dist/sea.js"></script>
 <script src="bower_components/angular/angular.js"></script>
-<script src="bower_components/ng-websocket/ng-websocket.js"></script>
+<!-- <script src="bower_components/ng-websocket/ng-websocket.js"></script> -->
 <!-- endbower -->
 
 <script src="ui/kityminder.app.js"></script>
@@ -111,19 +116,56 @@
 <script src="ui/directive/fileSave/fileSave.directive.js"></script>
 <script src="ui/directive/fileImport/fileImport.directive.js"></script>
 
+<!-- <script src="ui/socket/collaboration.js"></script> -->
 
 <script>
     // 'use strict';
-	angular.module('kityminderDemo', ['kityminderEditor'])
-			.controller('MainController', function($scope) {
-				$scope.initEditor = function(editor, minder) {
-					window.editor = editor;
-					window.minder = minder;
-				};
-			});
+    var app = angular.module('kityminderDemo', ['kityminderEditor'])
+        .controller('MainController', function ($scope) {
+
+            $scope.initEditor = function (editor, minder) {
+                window.editor = editor;
+                window.minder = minder;
+            };
+        });
+
+    app.controller('mapImportCtrl', function ($scope) {
+
+        var maps = [];
+
+        var folderId = '7a3b61c2-1d6d-4791-a004-c2cce9547210'
+        try {
+            $.ajax({
+                url: 'http://localhost:8081/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
+                type: "GET",
+                success: function (data) {
+                    if (data == "Fail") {
+                        console.log(data);
+                    }
+                    else if (data.files.length != undefined) {
+                        
+                        console.log("success!");
+                        for (var i = 0; i < data.files.length; i++) {
+                            if (data.files[i].type == "others") {
+                                maps.push(data.files[i]);
+                            }
+                        }
+                    }
+
+                },
+                error: function (err) {
+                    console.log("fail.");
+                }
+            });
+        }
+        catch (ex) {
+            console.log("fail")
+        }
+
+        $scope.mindmapRes = maps;
+
+    });
 
 </script>
 
-<script src="ui/socket/collaboration.js"></script>
-<!-- <script src="src/dataImportExport.js"></script> -->
 </html>
