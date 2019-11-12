@@ -21,10 +21,10 @@ angular.module('kityminderEditor')
 
 				$scope.getProgressTitle = function(p) {
 					switch(p) {
-						case 0: return '移除进度';
-						case 1: return '未开始';
-						case 9: return '全部完成';
-						default: return '完成' + (p - 1) + '/8';
+						case 0: return 'Remove progress';
+						case 1: return 'Undone';
+						case 9: return 'Done';
+						default: return 'Done' + (p - 1) + '/8';
 
 					}
 				}

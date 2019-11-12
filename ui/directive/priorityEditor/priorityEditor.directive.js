@@ -22,8 +22,8 @@ angular.module('kityminderEditor')
 
 	            $scope.getPriorityTitle = function(p) {
 		            switch(p) {
-			            case 0: return '移除优先级';
-			            default: return '优先级' + p;
+			            case 0: return 'Remove priority';
+			            default: return 'Priority' + p;
 		            }
 	            }
             }

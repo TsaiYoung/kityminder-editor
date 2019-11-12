@@ -54,7 +54,9 @@ angular.module('kityminderEditor')
                                             console.log(data);
                                         }
                                         else if (data.uploaded.length > 0) {
-                                            console.log("success!");
+                                            alert("Save this mind map successfully");
+                                            // update $scope.mindmapRes
+                                            scope
                                         }
                                     },
                                     error: function (err) {

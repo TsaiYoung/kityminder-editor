@@ -1,14 +1,14 @@
 <div class="btn-group-vertical" dropdown is-open="isopen">
     <button type="button" class="btn btn-default import" title="{{ 'import' | lang:'ui' }}"
-        ng-class="{'active': isopen}" data-toggle="modal" data-target="#importModal"></button>
+        ng-class="{'active': isopen}" data-toggle="modal" data-target="#importModal" ng-click="updateMaplist()"></button>
     <button type="button" class="btn btn-default import-caption dropdown-toggle" data-toggle="modal"
-        data-target="#importModal" title="{{ 'import' | lang:'ui' }}">
+        data-target="#importModal" title="{{ 'import' | lang:'ui' }}" ng-click="updateMaplist()">
         <span class="caption">{{ 'import' | lang:'ui' }}</span>
         <span class="sr-only">{{ 'import' | lang:'ui' }}</span>
     </button>
     <!-- 模态框（Modal） -->
     <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-        aria-hidden="true" ng-controller="mapImportCtrl">
+        aria-hidden="true">
         <div class="modal-dialog" style="width: 800px;">
             <div class="modal-content">
                 <div class="modal-header">

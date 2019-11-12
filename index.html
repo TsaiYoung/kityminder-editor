@@ -45,7 +45,9 @@
 </head>
 
 <body ng-app="kityminderDemo" ng-controller="MainController">
-    <h1 class="editor-title">Collaborative mindmap tool</h1>
+    <h1 class="editor-title">Collaborative mindmap tool
+
+    </h1>
     <kityminder-editor on-init="initEditor(editor, minder)"></kityminder-editor>
 </body>
 
@@ -71,7 +73,7 @@
 <script src="bower_components/color-picker/dist/color-picker.js"></script>
 <script src="bower_components/seajs/dist/sea.js"></script>
 <script src="bower_components/angular/angular.js"></script>
-<!-- <script src="bower_components/ng-websocket/ng-websocket.js"></script> -->
+<script src="bower_components/angular-websocket/dist/angular-websocket.js"></script>
 <!-- endbower -->
 
 <script src="ui/kityminder.app.js"></script>
@@ -120,51 +122,86 @@
 
 <script>
     // 'use strict';
-    var app = angular.module('kityminderDemo', ['kityminderEditor'])
-        .controller('MainController', function ($scope) {
+    var app = angular.module('kityminderDemo', ['kityminderEditor', 'ngWebSocket']);
 
-            $scope.initEditor = function (editor, minder) {
-                window.editor = editor;
-                window.minder = minder;
-            };
+    app.factory('Messages', function ($websocket) {
+
+        var roomId = "7a3b61c2-1d6d-4791-a004-c2cce9547210";
+        var wsUrl = "ws://localhost:8081/GeoProblemSolving/Mindmap/" + roomId;
+        var dataStream = $websocket(wsUrl);
+        var global_callback = null;
+
+        var collection = {};
+
+        dataStream.onOpen(function (msg) {
+            console.log("Websocket open..");
         });
 
-    app.controller('mapImportCtrl', function ($scope) {
+        dataStream.onMessage(function (msg) {
+            recieveMsg(msg.data);
+        });
 
-        var maps = [];
+        dataStream.onClose(function (event) {
+            console.log("Websocket close..");
+        });
 
-        var folderId = '7a3b61c2-1d6d-4791-a004-c2cce9547210'
-        try {
-            $.ajax({
-                url: 'http://localhost:8081/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
-                type: "GET",
-                success: function (data) {
-                    if (data == "Fail") {
-                        console.log(data);
-                    }
-                    else if (data.files.length != undefined) {
-                        
-                        console.log("success!");
-                        for (var i = 0; i < data.files.length; i++) {
-                            if (data.files[i].type == "others") {
-                                maps.push(data.files[i]);
-                            }
-                        }
-                    }
+        dataStream.onError(function (event) {
+            console.log("Websocket error..");
+        });
 
-                },
-                error: function (err) {
-                    console.log("fail.");
-                }
-            });
-        }
-        catch (ex) {
-            console.log("fail")
+        function sendSock(agentData, callback) {
+
+            global_callback = callback;
+            if (dataStream.readyState === 1) {
+                // 若是ws开启状态
+                sendMsg(agentData)
+            } else if (dataStream.readyState === dataStream.CONNECTING) {
+                // 若是 正在开启状态，则等待1s后重新调用
+                setTimeout(function () {
+                    sendSock(agentData, callback);
+                }, 1000);
+            } else {
+                // 若未开启 ，则等待1s后重新调用
+                setTimeout(function () {
+                    sendSock(agentData, callback);
+                }, 1000);
+            }
         }
 
-        $scope.mindmapRes = maps;
+        function recieveMsg(msg) {
+            var data = JSON.parse(msg);
 
+            // if (data.type != "ping") {
+            if (global_callback != null && global_callback != "" && global_callback != undefined) {
+                global_callback(data);
+            }
+            // }
+        }
+
+        function sendMsg(data) {
+            var msgData = {
+                "messageType": "Message",
+                "content": data
+            };
+            dataStream.send(JSON.stringify(msgData));
+        }
+
+        var methods = {
+            collection: collection,
+            sendSock: sendSock
+        };
+
+        return methods;
     });
+
+    app.controller('MainController', function ($scope) {
+
+        $scope.initEditor = function (editor, minder) {
+            window.editor = editor;
+            window.minder = minder;
+        };
+    });
+
 
 </script>
 

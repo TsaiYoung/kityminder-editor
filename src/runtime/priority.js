@@ -8,7 +8,7 @@ define(function(require, exports, module){
 
         main.button({
             position: 'top',
-            label: '优先级',
+            label: 'Priority',
             key: 'P',
             next: 'priority',
             enable: function() {

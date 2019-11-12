@@ -4,12 +4,48 @@ angular.module('kityminderEditor')
             restrict: 'E',
             templateUrl: 'ui/directive/fileImport/fileImport.html',
             scope: {
-                minder: '='
+                minder: '=',
+                mindmapRes:'='
             },
             replace: true,
             link: function (scope) {
+                scope.updateMaplist = updateMaplist;
                 scope.mapImport = mapImport;
                 scope.mapLoad = mapLoad;
+
+                function updateMaplist() {
+                    var maps = [];
+
+                    var folderId = '7a3b61c2-1d6d-4791-a004-c2cce9547210'
+                    try {
+                        $.ajax({
+                            url: 'http://localhost:8081/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
+                            type: "GET",
+                            success: function (data) {
+                                if (data == "Fail") {
+                                    console.log(data);
+                                }
+                                else if (data.files.length != undefined) {
+
+                                    console.log("success!");
+                                    for (var i = 0; i < data.files.length; i++) {
+                                        if (data.files[i].type == "others") {
+                                            maps.push(data.files[i]);
+                                        }
+                                    }
+                                    scope.mindmapRes = maps;
+                                }
+
+                            },
+                            error: function (err) {
+                                console.log("fail.");
+                            }
+                        });
+                    }
+                    catch (ex) {
+                        console.log("fail")
+                    }
+                }
 
                 function mapImport() {
 
@@ -61,7 +97,7 @@ angular.module('kityminderEditor')
 
                     try {
 
-                        var url = "http://localhost:8081"+map.pathURL;
+                        var url = "http://localhost:8081" + map.pathURL;
                         var xhr = new XMLHttpRequest();
                         xhr.open("GET", url, true);
                         xhr.onload = function (e) {

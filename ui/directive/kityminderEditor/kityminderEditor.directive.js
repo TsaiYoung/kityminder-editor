@@ -1,13 +1,14 @@
 angular.module('kityminderEditor')
-	.directive('kityminderEditor', ['config', 'minder.service', 'revokeDialog', function(config, minderService, revokeDialog) {
+	.directive('kityminderEditor', ['config', 'minder.service', 'revokeDialog', 'Messages', function (config, minderService, revokeDialog, Messages) {
 		return {
 			restrict: 'EA',
 			templateUrl: 'ui/directive/kityminderEditor/kityminderEditor.html',
 			replace: true,
 			scope: {
-				onInit: '&'
+				onInit: '&',
+				// Messages: 'Messages=' 
 			},
-			link: function(scope, element, attributes) {
+			link: function (scope, element, attributes) {
 
 				var $minderEditor = element.children('.minder-editor')[0];
 
@@ -20,13 +21,26 @@ angular.module('kityminderEditor')
 					minderService.executeCallback();
 				}
 
-				if (typeof(seajs) != 'undefined') {
+				function getSocketConnect(data) {
+					// websocket
+					if (data != {}) {
+
+						if (data.content.event == "contentchange") {
+							var mindmap = data.content.value
+							editor.minder.importJson(mindmap);
+						}
+
+						Messages.collection = {};
+					}
+				}
+
+				if (typeof (seajs) != 'undefined') {
 					/* global seajs */
 					seajs.config({
 						base: './src'
 					});
 
-					define('demo', function(require) {
+					define('demo', function (require) {
 						var Editor = require('editor');
 
 						var editor = window.editor = new Editor($minderEditor);
@@ -35,17 +49,24 @@ angular.module('kityminderEditor')
 							editor.minder.importJson(JSON.parse(window.localStorage.__dev_minder_content));
 						}
 
-						editor.minder.on('contentchange', function() {
+						editor.minder.on('contentchange', function () {
 							window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());
+
+							// websocket
+							var socketContent = {
+								"event": "contentchange",
+								"value": window.localStorage.__dev_minder_content
+							}
+							Messages.sendSock(socketContent, getSocketConnect);
 						});
 
 						window.minder = window.km = editor.minder;
 
 						scope.editor = editor;
 						scope.minder = minder;
-                        scope.config = config.get();
+						scope.config = config.get();
 
-                        //scope.minder.setDefaultOptions(scope.config);
+						//scope.minder.setDefaultOptions(scope.config);
 						scope.$apply();
 
 						onInit(editor, minder);
@@ -59,12 +80,12 @@ angular.module('kityminderEditor')
 					window.editor = scope.editor = editor;
 					window.minder = scope.minder = editor.minder;
 
-                    scope.config = config.get();
+					scope.config = config.get();
 
-                    //scope.minder.setDefaultOptions(config.getConfig());
+					//scope.minder.setDefaultOptions(config.getConfig());
 
-                    onInit(editor, editor.minder);
-                }
+					onInit(editor, editor.minder);
+				}
 
 			}
 		}

@@ -8,7 +8,7 @@ define(function(require, exports, module){
 
         main.button({
             position: 'top',
-            label: '进度',
+            label: 'Progress',
             key: 'G',
             next: 'progress',
             enable: function() {

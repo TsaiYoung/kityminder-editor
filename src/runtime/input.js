@@ -94,7 +94,7 @@ define(function(require, exports, module) {
         function setupHotbox() {
             hotbox.state('main').button({
                 position: 'center',
-                label: '编辑',
+                label: 'Edit',
                 key: 'F2',
                 enable: function() {
                     return minder.queryCommandState('text') != -1;
