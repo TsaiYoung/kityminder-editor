@@ -46,7 +46,7 @@
 
 <body ng-app="kityminderDemo" ng-controller="MainController">
     <h1 class="editor-title">Collaborative mindmap tool
-
+        <collab-panel participants="participants" drawer="drawer" collaboration="collaboration" draw="draw" leftApply="leftApply"></collab-panel>
     </h1>
     <kityminder-editor on-init="initEditor(editor, minder)"></kityminder-editor>
 </body>
@@ -90,6 +90,7 @@
 <script src="ui/dialog/hyperlink/hyperlink.ctrl.js"></script>
 <script src="ui/dialog/image/image.ctrl.js"></script>
 <script src="ui/dialog/imExportNode/imExportNode.ctrl.js"></script>
+<script src="ui/directive/collabPanel/collabPanel.directive.js"></script>
 <script src="ui/directive/topTab/topTab.directive.js"></script>
 <script src="ui/directive/undoRedo/undoRedo.directive.js"></script>
 <script src="ui/directive/appendNode/appendNode.directive.js"></script>
@@ -118,52 +119,73 @@
 <script src="ui/directive/fileSave/fileSave.directive.js"></script>
 <script src="ui/directive/fileImport/fileImport.directive.js"></script>
 
-<!-- <script src="ui/socket/collaboration.js"></script> -->
-
 <script>
     // 'use strict';
     var app = angular.module('kityminderDemo', ['kityminderEditor', 'ngWebSocket']);
 
     app.factory('Messages', function ($websocket) {
 
-        var roomId = "7a3b61c2-1d6d-4791-a004-c2cce9547210";
-        var wsUrl = "ws://localhost:8081/GeoProblemSolving/Mindmap/" + roomId;
-        var dataStream = $websocket(wsUrl);
-        var global_callback = null;
+        var connection = false;
+        var msgType = "";
+        var map_callback = null;
+        var collab_callback = null;
+        var dataStream = null;
+        // var msgData = {};
 
-        var collection = {};
+        function isConnection(){
+            return connection;
+        }
 
-        dataStream.onOpen(function (msg) {
-            console.log("Websocket open..");
-        });
+        function startWebsocket(roomId) {
 
-        dataStream.onMessage(function (msg) {
-            recieveMsg(msg.data);
-        });
+            var wsUrl = "ws://localhost:8081/GeoProblemSolving/Mindmap/" + roomId;
+            dataStream = $websocket(wsUrl);
 
-        dataStream.onClose(function (event) {
-            console.log("Websocket close..");
-        });
+            dataStream.onOpen(function (msg) {
+                console.log("Websocket open..");
+                connection = true;
+            });
 
-        dataStream.onError(function (event) {
-            console.log("Websocket error..");
-        });
+            dataStream.onMessage(function (msg) {
+                recieveMsg(msg.data);
+                connection = true;
+            });
 
-        function sendSock(agentData, callback) {
+            dataStream.onClose(function (msg) {
+                console.log("Websocket close..");
+                connection = false;
+            });
 
-            global_callback = callback;
+            dataStream.onError(function (msg) {
+                console.log("Websocket error..");
+                connection = false;
+            });
+        }
+
+        function sendSock(type, agentData, callback) {
+
+            if (type == "collaboration") {
+                msgType = type;
+                collab_callback = callback;
+            }
+            else if (type == "mindmap") {
+                msgType = type;
+                map_callback = callback;
+            }
+
+
             if (dataStream.readyState === 1) {
                 // 若是ws开启状态
                 sendMsg(agentData)
             } else if (dataStream.readyState === dataStream.CONNECTING) {
                 // 若是 正在开启状态，则等待1s后重新调用
                 setTimeout(function () {
-                    sendSock(agentData, callback);
+                    sendSock(type, agentData, callback);
                 }, 1000);
             } else {
                 // 若未开启 ，则等待1s后重新调用
                 setTimeout(function () {
-                    sendSock(agentData, callback);
+                    sendSock(type, agentData, callback);
                 }, 1000);
             }
         }
@@ -171,24 +193,32 @@
         function recieveMsg(msg) {
             var data = JSON.parse(msg);
 
-            // if (data.type != "ping") {
-            if (global_callback != null && global_callback != "" && global_callback != undefined) {
-                global_callback(data);
+            if (msgType == "mindmap") {
+                if (map_callback != null && map_callback != undefined) {
+                    map_callback(data);
+                }
             }
-            // }
+            else if (msgType == "collaboration") {
+                if (collab_callback != null && collab_callback != undefined) {
+                    collab_callback(data);
+                }
+            }
         }
 
         function sendMsg(data) {
-            var msgData = {
-                "messageType": "Message",
-                "content": data
-            };
-            dataStream.send(JSON.stringify(msgData));
+            dataStream.send(JSON.stringify(data));
+        }
+
+        function endWebsocket() {
+            dataStream.close();
         }
 
         var methods = {
-            collection: collection,
-            sendSock: sendSock
+            isConnection: isConnection,
+            // msgData: msgData,
+            startWebsocket: startWebsocket,
+            sendSock: sendSock,
+            endWebsocket: endWebsocket
         };
 
         return methods;

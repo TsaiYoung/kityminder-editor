@@ -6,7 +6,6 @@ angular.module('kityminderEditor')
 			replace: true,
 			scope: {
 				onInit: '&',
-				// Messages: 'Messages=' 
 			},
 			link: function (scope, element, attributes) {
 
@@ -25,12 +24,10 @@ angular.module('kityminderEditor')
 					// websocket
 					if (data != {}) {
 
-						if (data.content.event == "contentchange") {
-							var mindmap = data.content.value
+						if (data.messageType == "Message" && data.event == "contentchange") {
+							var mindmap = data.value
 							editor.minder.importJson(mindmap);
 						}
-
-						Messages.collection = {};
 					}
 				}
 
@@ -52,12 +49,15 @@ angular.module('kityminderEditor')
 						editor.minder.on('contentchange', function () {
 							window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());
 
-							// websocket
-							var socketContent = {
-								"event": "contentchange",
-								"value": window.localStorage.__dev_minder_content
+							if (Messages.isConnection) {
+								// websocket
+								var socketContent = {
+									"messageType": "Message",
+									"event": "contentchange",
+									"value": window.localStorage.__dev_minder_content
+								}
+								Messages.sendSock("mindmap", socketContent, getSocketConnect);
 							}
-							Messages.sendSock(socketContent, getSocketConnect);
 						});
 
 						window.minder = window.km = editor.minder;
