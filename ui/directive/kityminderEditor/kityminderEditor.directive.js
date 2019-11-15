@@ -49,7 +49,7 @@ angular.module('kityminderEditor')
 						editor.minder.on('contentchange', function () {
 							window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());
 
-							if (Messages.isConnection) {
+							if (Messages.connection) {
 								// websocket
 								var socketContent = {
 									"messageType": "Message",

@@ -1,5 +1,5 @@
 angular.module('kityminderEditor')
-    .directive('collabPanel', ['Messages', function (Messages) {
+    .directive('collabPanel', ['Messages', 'RouteInfo', function (Messages, RouteInfo) {
         return {
             restrict: 'E',
             templateUrl: 'ui/directive/collabPanel/collabPanel.html',
@@ -111,7 +111,9 @@ angular.module('kityminderEditor')
                 }
 
                 function startCollab() {
-                    Messages.startWebsocket("7a3b61c2-1d6d-4791-a004-c2cce9547210");
+
+                    var info = RouteInfo.getInfo();
+                    Messages.startWebsocket(info.pageId);
 
                     var socketContent = {
                         "messageType": "Join",

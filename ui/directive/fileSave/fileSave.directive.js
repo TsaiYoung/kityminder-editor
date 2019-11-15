@@ -1,5 +1,5 @@
 angular.module('kityminderEditor')
-    .directive('fileSave', function () {
+    .directive('fileSave', ['RouteInfo', function (RouteInfo) {
         return {
             restrict: 'E',
             templateUrl: 'ui/directive/fileSave/fileSave.html',
@@ -29,6 +29,8 @@ angular.module('kityminderEditor')
 
                         editor.minder.exportData(exportType).then(function (content) {
 
+                            var info = RouteInfo.getInfo();
+
                             // 文件上传
                             var blob = new Blob([content]);
                             var filename = $('#mindmapName').val() + '.' + datatype;
@@ -38,9 +40,9 @@ angular.module('kityminderEditor')
                             formData.append("file", fileBlob);
                             formData.append("description", "Collaborative mindmap tool");
                             formData.append("type", "others");
-                            formData.append("uploaderId", "7fcc54b5-9000-4308-a458-82cc590b80b1");
+                            formData.append("uploaderId", info.userId);
                             formData.append("privacy", "private");
-                            formData.append("folderId", "7a3b61c2-1d6d-4791-a004-c2cce9547210");
+                            formData.append("folderId", info.pageId);
 
                             try {
                                 $.ajax({
@@ -123,4 +125,4 @@ angular.module('kityminderEditor')
                 }
             }
         }
-    });
+    }]);

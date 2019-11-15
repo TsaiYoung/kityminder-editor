@@ -46,7 +46,8 @@
 
 <body ng-app="kityminderDemo" ng-controller="MainController">
     <h1 class="editor-title">Collaborative mindmap tool
-        <collab-panel participants="participants" drawer="drawer" collaboration="collaboration" draw="draw" leftApply="leftApply"></collab-panel>
+        <collab-panel participants="participants" drawer="drawer" collaboration="collaboration" draw="draw"
+            leftApply="leftApply"></collab-panel>
     </h1>
     <kityminder-editor on-init="initEditor(editor, minder)"></kityminder-editor>
 </body>
@@ -74,6 +75,7 @@
 <script src="bower_components/seajs/dist/sea.js"></script>
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/angular-websocket/dist/angular-websocket.js"></script>
+<!-- <script src="bower_components/angular-route/angular-route.min.js"></script> -->
 <!-- endbower -->
 
 <script src="ui/kityminder.app.js"></script>
@@ -123,6 +125,44 @@
     // 'use strict';
     var app = angular.module('kityminderDemo', ['kityminderEditor', 'ngWebSocket']);
 
+    app.factory('RouteInfo', function () {
+
+        try {
+            var href = window.location.href;
+            var url = href.split('&')
+
+            for (var i = 0; i < url.length; i++) {
+
+                var reg = /groupID=(\S*)/;
+                var pageId = url[i].match(reg)[1];
+
+                reg = /userID=(\S*)/;
+                var userId = url[i].match(reg)[1];
+
+                reg = /userName=(\S*)/;
+                var userName = url[i].match(reg)[1];
+            }
+        }
+        catch (ex) {
+            var pageId = "";
+            var userId = "";
+            var userName = "";
+        }
+
+        var methods = {
+            getInfo: function () {
+                var info = {
+                    "userId": userId,
+                    "userName": userName,
+                    "pageId": pageId
+                }
+                return info;
+            }
+        }
+
+        return methods;
+    });
+
     app.factory('Messages', function ($websocket) {
 
         var connection = false;
@@ -132,7 +172,7 @@
         var dataStream = null;
         // var msgData = {};
 
-        function isConnection(){
+        function isConnection() {
             return connection;
         }
 

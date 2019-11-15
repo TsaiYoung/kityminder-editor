@@ -1,5 +1,5 @@
 angular.module('kityminderEditor')
-    .directive('fileImport', function () {
+    .directive('fileImport', ['RouteInfo', function (RouteInfo) {
         return {
             restrict: 'E',
             templateUrl: 'ui/directive/fileImport/fileImport.html',
@@ -16,7 +16,8 @@ angular.module('kityminderEditor')
                 function updateMaplist() {
                     var maps = [];
 
-                    var folderId = '7a3b61c2-1d6d-4791-a004-c2cce9547210'
+                    var info = RouteInfo.getInfo();
+                    var folderId = info.pageId;
                     try {
                         $.ajax({
                             url: 'http://localhost:8081/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
@@ -117,4 +118,4 @@ angular.module('kityminderEditor')
                 }
             }
         }
-    });
+    }]);

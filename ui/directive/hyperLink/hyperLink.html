@@ -1,4 +1,23 @@
-<div class="btn-group-vertical" dropdown is-open="isopen">
+<div class="btn-group-vertical" dropdown is-open="isopen" style="cursor:not-allowed">
+    <button type="button"
+            class="btn btn-default hyperlink"
+            title="{{ 'link' | lang:'ui' }}"
+            ng-class="{'active': isopen}"
+            style="cursor:not-allowed"
+            ng-disabled="minder.queryCommandState('HyperLink') === -1"></button>
+    <button type="button"
+            class="btn btn-default hyperlink-caption dropdown-toggle"
+            ng-disabled="minder.queryCommandState('HyperLink') === -1"
+            title="{{ 'link' | lang:'ui' }}"
+            style="cursor:not-allowed"
+            dropdown-toggle>
+        <span class="caption">{{ 'link' | lang:'ui' }}</span>
+        <span class="caret"></span>
+        <span class="sr-only">{{ 'link' | lang:'ui' }}</span>
+    </button>
+</div>
+
+<!-- <div class="btn-group-vertical" dropdown is-open="isopen">
     <button type="button"
             class="btn btn-default hyperlink"
             title="{{ 'link' | lang:'ui' }}"
@@ -24,4 +43,4 @@
                ng-click="minder.execCommand('HyperLink', null)">{{ 'removelink' | lang:'ui' }}</a>
         </li>
     </ul>
-</div>
+</div> -->

@@ -2120,12 +2120,12 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/hyperLink/hyperLink.html',
-    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default hyperlink\" title=\"{{ 'link' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" ng-click=\"addHyperlink()\" ng-disabled=\"minder.queryCommandState('HyperLink') === -1\"></button> <button type=\"button\" class=\"btn btn-default hyperlink-caption dropdown-toggle\" ng-disabled=\"minder.queryCommandState('HyperLink') === -1\" title=\"{{ 'link' | lang:'ui' }}\" dropdown-toggle><span class=\"caption\">{{ 'link' | lang:'ui' }}</span> <span class=\"caret\"></span> <span class=\"sr-only\">{{ 'link' | lang:'ui' }}</span></button><ul class=\"dropdown-menu\" role=\"menu\"><li><a href ng-click=\"addHyperlink()\">{{ 'insertlink' | lang:'ui' }}</a></li><li><a href ng-click=\"minder.execCommand('HyperLink', null)\">{{ 'removelink' | lang:'ui' }}</a></li></ul></div>"
+    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\" style=\"cursor:not-allowed\"><button type=\"button\" class=\"btn btn-default hyperlink\" title=\"{{ 'link' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" style=\"cursor:not-allowed\" ng-disabled=\"minder.queryCommandState('HyperLink') === -1\"></button> <button type=\"button\" class=\"btn btn-default hyperlink-caption dropdown-toggle\" ng-disabled=\"minder.queryCommandState('HyperLink') === -1\" title=\"{{ 'link' | lang:'ui' }}\" style=\"cursor:not-allowed\" dropdown-toggle><span class=\"caption\">{{ 'link' | lang:'ui' }}</span> <span class=\"caret\"></span> <span class=\"sr-only\">{{ 'link' | lang:'ui' }}</span></button></div>"
   );
 
 
   $templateCache.put('ui/directive/imageBtn/imageBtn.html',
-    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default image-btn\" title=\"{{ 'image' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" ng-click=\"addImage()\" ng-disabled=\"minder.queryCommandState('Image') === -1\"></button> <button type=\"button\" class=\"btn btn-default image-btn-caption dropdown-toggle\" ng-disabled=\"minder.queryCommandState('Image') === -1\" title=\"{{ 'image' | lang:'ui' }}\" dropdown-toggle><span class=\"caption\">{{ 'image' | lang:'ui' }}</span> <span class=\"caret\"></span> <span class=\"sr-only\">{{ 'image' | lang:'ui' }}</span></button><ul class=\"dropdown-menu\" role=\"menu\"><li><a href ng-click=\"addImage()\">{{ 'insertimage' | lang:'ui' }}</a></li><li><a href ng-click=\"minder.execCommand('Image', '')\">{{ 'removeimage' | lang:'ui' }}</a></li></ul></div>"
+    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\" style=\"cursor:not-allowed\"><button type=\"button\" class=\"btn btn-default image-btn\" title=\"{{ 'image' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" style=\"cursor:not-allowed\" ng-disabled=\"minder.queryCommandState('Image') === -1\"></button> <button type=\"button\" class=\"btn btn-default image-btn-caption dropdown-toggle\" ng-disabled=\"minder.queryCommandState('Image') === -1\" title=\"{{ 'image' | lang:'ui' }}\" style=\"cursor:not-allowed\" dropdown-toggle><span class=\"caption\">{{ 'image' | lang:'ui' }}</span> <span class=\"caret\"></span> <span class=\"sr-only\">{{ 'image' | lang:'ui' }}</span></button></div>"
   );
 
 
@@ -3349,7 +3349,7 @@ angular.module('kityminderEditor')
         }
     }]);
 angular.module('kityminderEditor')
-    .directive('collabPanel', ['Messages', function (Messages) {
+    .directive('collabPanel', ['Messages', 'RouteInfo', function (Messages, RouteInfo) {
         return {
             restrict: 'E',
             templateUrl: 'ui/directive/collabPanel/collabPanel.html',
@@ -3461,7 +3461,9 @@ angular.module('kityminderEditor')
                 }
 
                 function startCollab() {
-                    Messages.startWebsocket("7a3b61c2-1d6d-4791-a004-c2cce9547210");
+
+                    var info = RouteInfo.getInfo();
+                    Messages.startWebsocket(info.pageId);
 
                     var socketContent = {
                         "messageType": "Join",
@@ -3556,7 +3558,7 @@ angular.module('kityminderEditor')
         }
     });
 angular.module('kityminderEditor')
-    .directive('fileImport', function () {
+    .directive('fileImport', ['RouteInfo', function (RouteInfo) {
         return {
             restrict: 'E',
             templateUrl: 'ui/directive/fileImport/fileImport.html',
@@ -3573,7 +3575,8 @@ angular.module('kityminderEditor')
                 function updateMaplist() {
                     var maps = [];
 
-                    var folderId = '7a3b61c2-1d6d-4791-a004-c2cce9547210'
+                    var info = RouteInfo.getInfo();
+                    var folderId = info.pageId;
                     try {
                         $.ajax({
                             url: 'http://localhost:8081/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
@@ -3674,9 +3677,9 @@ angular.module('kityminderEditor')
                 }
             }
         }
-    });
+    }]);
 angular.module('kityminderEditor')
-    .directive('fileSave', function () {
+    .directive('fileSave', ['RouteInfo', function (RouteInfo) {
         return {
             restrict: 'E',
             templateUrl: 'ui/directive/fileSave/fileSave.html',
@@ -3706,6 +3709,8 @@ angular.module('kityminderEditor')
 
                         editor.minder.exportData(exportType).then(function (content) {
 
+                            var info = RouteInfo.getInfo();
+
                             // 文件上传
                             var blob = new Blob([content]);
                             var filename = $('#mindmapName').val() + '.' + datatype;
@@ -3715,9 +3720,9 @@ angular.module('kityminderEditor')
                             formData.append("file", fileBlob);
                             formData.append("description", "Collaborative mindmap tool");
                             formData.append("type", "others");
-                            formData.append("uploaderId", "7fcc54b5-9000-4308-a458-82cc590b80b1");
+                            formData.append("uploaderId", info.userId);
                             formData.append("privacy", "private");
-                            formData.append("folderId", "7a3b61c2-1d6d-4791-a004-c2cce9547210");
+                            formData.append("folderId", info.pageId);
 
                             try {
                                 $.ajax({
@@ -3800,7 +3805,7 @@ angular.module('kityminderEditor')
                 }
             }
         }
-    });
+    }]);
 angular.module('kityminderEditor')
 	.directive('fontOperator', function() {
 		return {
@@ -4005,7 +4010,7 @@ angular.module('kityminderEditor')
 						editor.minder.on('contentchange', function () {
 							window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());
 
-							if (Messages.isConnection) {
+							if (Messages.connection) {
 								// websocket
 								var socketContent = {
 									"messageType": "Message",
