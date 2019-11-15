@@ -5,7 +5,7 @@ angular.module('kityminderEditor')
             templateUrl: 'ui/directive/fileImport/fileImport.html',
             scope: {
                 minder: '=',
-                mindmapRes:'='
+                mindmapRes:'=?'
             },
             replace: true,
             link: function (scope) {
@@ -22,6 +22,7 @@ angular.module('kityminderEditor')
                         $.ajax({
                             url: 'http://localhost:8081/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
                             type: "GET",
+                            async: false,
                             success: function (data) {
                                 if (data == "Fail") {
                                     console.log(data);

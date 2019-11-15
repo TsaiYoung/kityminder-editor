@@ -127,26 +127,27 @@
 
     app.factory('RouteInfo', function () {
 
-        try {
-            var href = window.location.href;
-            var url = href.split('&')
+        var pageId = "", userId = "", userName = "";
 
-            for (var i = 0; i < url.length; i++) {
+        var href = window.location.href;
+        var url = href.split('&')
 
-                var reg = /groupID=(\S*)/;
-                var pageId = url[i].match(reg)[1];
+        for (var i = 0; i < url.length; i++) {
 
-                reg = /userID=(\S*)/;
-                var userId = url[i].match(reg)[1];
-
-                reg = /userName=(\S*)/;
-                var userName = url[i].match(reg)[1];
+            if (/groupID/.test(url[i])) {
+                pageId = url[i].match(/groupID=(\S*)/)[1];
+                continue;
             }
-        }
-        catch (ex) {
-            var pageId = "";
-            var userId = "";
-            var userName = "";
+
+            if (/userID/.test(url[i])) {
+                userId = url[i].match(/userID=(\S*)/)[1];
+                continue;
+            }
+
+            if (/userName/.test(url[i])) {
+                userName = url[i].match(/userName=(\S*)/)[1];
+                continue;
+            }
         }
 
         var methods = {

@@ -2090,7 +2090,7 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/collabPanel/collabPanel.html',
-    "<div style=\"float: right; max-width: 800px\"><span class=\"glyphicon glyphicon-link\" aria-hidden=\"true\" title=\"Click it and start collaboration\" ng-show=\"!collaboration\" style=\"margin-left: 10px;cursor:pointer;margin-right: 30px\" ng-click=\"startCollab()\"></span> <span class=\"glyphicon glyphicon-globe\" aria-hidden=\"true\" title=\"Click it and stop collaboration\" ng-show=\"collaboration\" style=\"margin-left: 10px;cursor:pointer;margin-right: 30px\" ng-click=\"stopCollab()\"></span> <span class=\"glyphicon glyphicon-pencil\" aria-hidden=\"true\" title=\"Apply to draw the mind map\" ng-show=\"!draw\" style=\"cursor:pointer;margin-right: 20px\" ng-click=\"applyCtrl()\"></span> <span class=\"glyphicon glyphicon-refresh\" aria-hidden=\"true\" title=\"Give up to draw the mind map\" ng-show=\"draw\" style=\"cursor:pointer;margin-right: 20px\" ng-click=\"giveupCtrl()\"></span> <span class=\"glyphicon glyphicon-user\" aria-hidden=\"true\" title=\"{{drawer}} is drawing the mind map\" style=\"cursor:pointer;margin-right: 10px\" ng-show=\"draw\"></span> <span ng-show=\"draw\" style=\"margin-right: 20px;margin-left: 10px\">{{leftApply}} people waiting for drawing.</span> <span class=\"glyphicon glyphicon-user\" aria-hidden=\"true\" ng-repeat=\"user in participants\" title=\"{{user}}\" style=\"cursor:pointer;margin-right: 15px\"></span></div>"
+    "<div style=\"float: right; max-width: 800px\"><span class=\"glyphicon glyphicon-link\" aria-hidden=\"true\" title=\"Click it and start collaboration\" ng-show=\"!collaboration\" style=\"margin-left: 10px;cursor:pointer;margin-right: 30px\" ng-click=\"startCollab()\"></span> <span class=\"glyphicon glyphicon-globe\" aria-hidden=\"true\" title=\"Click it and stop collaboration\" ng-show=\"collaboration\" style=\"margin-left: 10px;cursor:pointer;margin-right: 30px\" ng-click=\"stopCollab()\"></span> <span class=\"glyphicon glyphicon-pencil\" aria-hidden=\"true\" title=\"Apply to draw the mind map\" ng-show=\"!draw\" style=\"cursor:pointer;margin-right: 20px\" ng-click=\"applyCtrl()\"></span> <span class=\"glyphicon glyphicon-refresh\" aria-hidden=\"true\" title=\"Give up to draw the mind map\" ng-show=\"draw\" style=\"cursor:pointer;margin-right: 20px\" ng-click=\"giveupCtrl()\"></span> <span class=\"glyphicon glyphicon-user\" aria-hidden=\"true\" title=\"{{drawer}} is drawing the mind map\" style=\"margin-right: 10px\" ng-show=\"draw\"></span> <span ng-show=\"draw\" style=\"margin-right: 20px;margin-left: 10px\">{{leftApply}} people waiting for drawing.</span> <span class=\"glyphicon glyphicon-user\" aria-hidden=\"true\" ng-repeat=\"user in participants\" title=\"{{user}}\" style=\"margin-right: 15px\"></span></div>"
   );
 
 
@@ -3467,7 +3467,7 @@ angular.module('kityminderEditor')
 
                     var socketContent = {
                         "messageType": "Join",
-                        "value": "XXX"
+                        "value": info.userName
                     }
                     Messages.sendSock("collaboration", socketContent, function (data) {
 
@@ -3564,7 +3564,7 @@ angular.module('kityminderEditor')
             templateUrl: 'ui/directive/fileImport/fileImport.html',
             scope: {
                 minder: '=',
-                mindmapRes:'='
+                mindmapRes:'=?'
             },
             replace: true,
             link: function (scope) {
@@ -3581,6 +3581,7 @@ angular.module('kityminderEditor')
                         $.ajax({
                             url: 'http://localhost:8081/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
                             type: "GET",
+                            async: false,
                             success: function (data) {
                                 if (data == "Fail") {
                                     console.log(data);

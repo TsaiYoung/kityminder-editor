@@ -117,7 +117,7 @@ angular.module('kityminderEditor')
 
                     var socketContent = {
                         "messageType": "Join",
-                        "value": "XXX"
+                        "value": info.userName
                     }
                     Messages.sendSock("collaboration", socketContent, function (data) {
 
