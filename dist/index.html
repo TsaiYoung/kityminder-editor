@@ -46,24 +46,8 @@
 
 <body ng-app="kityminderDemo" ng-controller="MainController">
     <h1 class="editor-title">Collaborative mindmap tool
-        <div style="float: right; max-width: 800px;">
-            <span class="glyphicon glyphicon-link" aria-hidden="true" title="Click it and start collaboration"
-                ng-show="!collaboration" style="margin-left: 10px;cursor:pointer;margin-right: 30px;"
-                ng-click="startCollab()"></span>
-            <span class="glyphicon glyphicon-globe" aria-hidden="true" title="Click it and stop collaboration"
-                ng-show="collaboration" style="margin-left: 10px;cursor:pointer;margin-right: 30px;"
-                ng-click="stopCollab()"></span>
-            <span class="glyphicon glyphicon-pencil" aria-hidden="true" title="Apply to draw the mind map"
-                ng-show="!draw" style="cursor:pointer;margin-right: 20px;" ng-click="applyCtrl()"></span>
-            <span class="glyphicon glyphicon-refresh" aria-hidden="true" title="Give up to draw the mind map"
-                ng-show="draw" style="cursor:pointer;margin-right: 20px;" ng-click="giveupCtrl()"></span>
-            <span class="glyphicon glyphicon-user" aria-hidden="true" title="{{drawer}} is drawing the mind map"
-                style="cursor:pointer;margin-right: 10px;" ng-show="draw"></span>
-            <span ng-show="draw" style="margin-right: 20px;margin-left: 10px;">{{leftApply}} people waiting for
-                drawing.</span>
-            <span class="glyphicon glyphicon-user" aria-hidden="true" ng-repeat="user in participants" title="{{user}}"
-                style="cursor:pointer;margin-right: 15px;"></span>
-        </div>
+        <collab-panel participants="participants" drawer="drawer" collaboration="collaboration" draw="draw"
+            leftApply="leftApply"></collab-panel>
     </h1>
     <kityminder-editor on-init="initEditor(editor, minder)"></kityminder-editor>
 </body>
@@ -99,6 +83,44 @@
     // 'use strict';
     var app = angular.module('kityminderDemo', ['kityminderEditor', 'ngWebSocket']);
 
+    app.factory('RouteInfo', function () {
+
+        try {
+            var href = window.location.href;
+            var url = href.split('&')
+
+            for (var i = 0; i < url.length; i++) {
+
+                var reg = /groupID=(\S*)/;
+                var pageId = url[i].match(reg)[1];
+
+                reg = /userID=(\S*)/;
+                var userId = url[i].match(reg)[1];
+
+                reg = /userName=(\S*)/;
+                var userName = url[i].match(reg)[1];
+            }
+        }
+        catch (ex) {
+            var pageId = "";
+            var userId = "";
+            var userName = "";
+        }
+
+        var methods = {
+            getInfo: function () {
+                var info = {
+                    "userId": userId,
+                    "userName": userName,
+                    "pageId": pageId
+                }
+                return info;
+            }
+        }
+
+        return methods;
+    });
+
     app.factory('Messages', function ($websocket) {
 
         var connection = false;
@@ -106,7 +128,11 @@
         var map_callback = null;
         var collab_callback = null;
         var dataStream = null;
-        var msgData = {};
+        // var msgData = {};
+
+        function isConnection() {
+            return connection;
+        }
 
         function startWebsocket(roomId) {
 
@@ -115,18 +141,22 @@
 
             dataStream.onOpen(function (msg) {
                 console.log("Websocket open..");
+                connection = true;
             });
 
             dataStream.onMessage(function (msg) {
                 recieveMsg(msg.data);
+                connection = true;
             });
 
             dataStream.onClose(function (msg) {
                 console.log("Websocket close..");
+                connection = false;
             });
 
             dataStream.onError(function (msg) {
                 console.log("Websocket error..");
+                connection = false;
             });
         }
 
@@ -182,8 +212,8 @@
         }
 
         var methods = {
-            connection: connection,
-            msgData: msgData,
+            isConnection: isConnection,
+            // msgData: msgData,
             startWebsocket: startWebsocket,
             sendSock: sendSock,
             endWebsocket: endWebsocket
@@ -192,152 +222,7 @@
         return methods;
     });
 
-    app.controller('MainController', function ($scope, Messages) {
-
-        $scope.participants = [];  // 在线用户列表
-
-        $scope.drawer = "Nobody";    // 画图者
-
-        $scope.collaboration = false;  //是否协同
-
-        $scope.draw = false;           //是否请求画图
-
-        $scope.leftApply = 0;
-
-        $scope.applyCtrl = function () {
-
-            if (Messages.connection && $scope.collaboration) {
-
-                var socketContent = {
-                    "messageType": "Authority",
-                    "value": "Require"
-                }
-                Messages.sendSock("collaboration", socketContent, function (data) {
-                    if (data != {}) {
-
-                        if (data.messageType == "Authority") {
-                            $scope.drawer = data.controller;
-                            $scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
-
-                            try {
-                                var requireList = JSON.parse(data.requireList);
-                                for (var i = 0; i < requireList.length; i++) {
-                                    if (requireList[i] == data.controller) {
-                                        $scope.leftApply = i;
-                                    }
-                                }
-                            }
-                            catch (ex) {
-                                $scope.leftApply = 0;
-                            }
-                        } else if (data.messageType == "Left") {
-                            $scope.drawer = data.controller;
-                            $scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
-
-                            try {
-                                var requireList = JSON.parse(data.requireList);
-                                for (var i = 0; i < requireList.length; i++) {
-                                    if (requireList[i] == data.controller) {
-                                        $scope.leftApply = i;
-                                    }
-                                }
-                            }
-                            catch (ex) {
-                                $scope.leftApply = 0;
-                            }
-                        }
-                    }
-                });
-
-                $scope.draw = true;
-            }
-        };
-
-        $scope.giveupCtrl = function () {
-
-            if (Messages.connection) {
-
-                var socketContent = {
-                    "messageType": "Authority",
-                    "value": "Release"
-                }
-                Messages.sendSock("collaboration", socketContent, function (data) {
-                    if (data != {}) {
-
-                        if (data.messageType == "Authority") {
-
-                            $scope.drawer = data.controller;
-                            $scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
-
-                        } else if (data.messageType == "Left") {
-                            $scope.drawer = data.controller;
-                            $scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
-
-                            try {
-                                var requireList = JSON.parse(data.requireList);
-                                for (var i = 0; i < requireList.length; i++) {
-                                    if (requireList[i] == data.controller) {
-                                        $scope.leftApply = i;
-                                    }
-                                }
-                            }
-                            catch (ex) {
-                                $scope.leftApply = 0;
-                            }
-                        }
-
-                    }
-                });
-            }
-
-            $scope.draw = false;
-        };
-
-        $scope.startCollab = function (editor, minder) {
-
-            Messages.startWebsocket("7a3b61c2-1d6d-4791-a004-c2cce9547210");
-
-            var socketContent = {
-                "messageType": "Join",
-                "value": "XXX"
-            }
-            Messages.sendSock("collaboration", socketContent, function (data) {
-
-                if (data != {}) {
-
-                    if (data.messageType == "Join") {
-                        $scope.drawer = data.controller;
-                        $scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
-                    }
-                    else if (data.messageType == "Left") {
-                        $scope.drawer = data.controller;
-                        $scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
-
-                        try {
-                            var requireList = JSON.parse(data.requireList);
-                            for (var i = 0; i < requireList.length; i++) {
-                                if (requireList[i] == data.controller) {
-                                    $scope.leftApply = i;
-                                }
-                            }
-                        }
-                        catch (ex) {
-                            $scope.leftApply = 0;
-                        }
-                    }
-
-                }
-            });
-            $scope.collaboration = true;
-        };
-
-        $scope.stopCollab = function (editor, minder) {
-            Messages.endWebsocket();
-            $scope.collaboration = false;
-            $scope.draw = false;
-            $scope.participants = [];
-            $scope.drawer = "Nobody";
-        };
+    app.controller('MainController', function ($scope) {
 
         $scope.initEditor = function (editor, minder) {
             window.editor = editor;
@@ -345,255 +230,8 @@
         };
     });
 
+
 </script>
-    // 'use strict';
-    var app = angular.module('kityminderDemo', ['kityminderEditor', 'ngWebSocket']);
 
-    app.factory('Messages', function ($websocket) {
-
-        var connection = false;
-        var msgType = "";
-        var map_callback = null;
-        var collab_callback = null;
-        var dataStream = null;
-        var msgData = {};
-
-        function startWebsocket(roomId) {
-
-            var wsUrl = "ws://localhost:8081/GeoProblemSolving/Mindmap/" + roomId;
-            dataStream = $websocket(wsUrl);
-
-            dataStream.onOpen(function (msg) {
-                console.log("Websocket open..");
-            });
-
-            dataStream.onMessage(function (msg) {
-                recieveMsg(msg.data);
-            });
-
-            dataStream.onClose(function (msg) {
-                console.log("Websocket close..");
-            });
-
-            dataStream.onError(function (msg) {
-                console.log("Websocket error..");
-            });
-        }
-
-        function sendSock(type, agentData, callback) {
-
-            if (type == "collaboration") {
-                msgType = type;
-                collab_callback = callback;
-            }
-            else if (type == "mindmap") {
-                msgType = type;
-                map_callback = callback;
-            }
-
-
-            if (dataStream.readyState === 1) {
-                // 若是ws开启状态
-                sendMsg(agentData)
-            } else if (dataStream.readyState === dataStream.CONNECTING) {
-                // 若是 正在开启状态，则等待1s后重新调用
-                setTimeout(function () {
-                    sendSock(type, agentData, callback);
-                }, 1000);
-            } else {
-                // 若未开启 ，则等待1s后重新调用
-                setTimeout(function () {
-                    sendSock(type, agentData, callback);
-                }, 1000);
-            }
-        }
-
-        function recieveMsg(msg) {
-            var data = JSON.parse(msg);
-
-            if (msgType == "mindmap") {
-                if (map_callback != null && map_callback != undefined) {
-                    map_callback(data);
-                }
-            }
-            else if (msgType == "collaboration") {
-                if (collab_callback != null && collab_callback != undefined) {
-                    collab_callback(data);
-                }
-            }
-        }
-
-        function sendMsg(data) {
-            dataStream.send(JSON.stringify(data));
-        }
-
-        function endWebsocket() {
-            dataStream.close();
-        }
-
-        var methods = {
-            collection: collection,
-            msgData: msgData,
-            startWebsocket: startWebsocket,
-            sendSock: sendSock,
-            endWebsocket: endWebsocket
-        };
-
-        return methods;
-    });
-
-    app.controller('MainController', function ($scope, Messages) {
-
-        $scope.participants = [];  // 在线用户列表
-
-        $scope.drawer = "Nobody";    // 画图者
-
-        $scope.collaboration = false;  //是否协同
-
-        $scope.draw = false;           //是否请求画图
-
-        $scope.leftApply = 0;
-
-        $scope.applyCtrl = function () {
-
-            if (Messages.collection && $scope.collaboration) {
-
-                var socketContent = {
-                    "messageType": "Authority",
-                    "value": "Require"
-                }
-                Messages.sendSock("collaboration", socketContent, function (data) {
-                    if (data != {}) {
-
-                        if (data.messageType == "Authority") {
-                            $scope.drawer = data.controller;
-                            $scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
-
-                            try {
-                                var requireList = JSON.parse(data.requireList);
-                                for (var i = 0; i < requireList.length; i++) {
-                                    if (requireList[i] == data.controller) {
-                                        $scope.leftApply = i;
-                                    }
-                                }
-                            }
-                            catch (ex) {
-                                $scope.leftApply = 0;
-                            }
-                        } else if (data.messageType == "Left") {
-                            $scope.drawer = data.controller;
-                            $scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
-
-                            try {
-                                var requireList = JSON.parse(data.requireList);
-                                for (var i = 0; i < requireList.length; i++) {
-                                    if (requireList[i] == data.controller) {
-                                        $scope.leftApply = i;
-                                    }
-                                }
-                            }
-                            catch (ex) {
-                                $scope.leftApply = 0;
-                            }
-                        }
-                    }
-                });
-
-                $scope.draw = true;
-            }
-        };
-
-        $scope.giveupCtrl = function () {
-            
-            if (Messages.collection) {
-
-                var socketContent = {
-                    "messageType": "Authority",
-                    "value": "Release"
-                }
-                Messages.sendSock("collaboration", socketContent, function (data) {
-                    if (data != {}) {
-
-                        if (data.messageType == "Authority") {
-
-                            $scope.drawer = data.controller;
-                            $scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
-
-                        } else if (data.messageType == "Left") {
-                            $scope.drawer = data.controller;
-                            $scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
-
-                            try {
-                                var requireList = JSON.parse(data.requireList);
-                                for (var i = 0; i < requireList.length; i++) {
-                                    if (requireList[i] == data.controller) {
-                                        $scope.leftApply = i;
-                                    }
-                                }
-                            }
-                            catch (ex) {
-                                $scope.leftApply = 0;
-                            }
-                        }
-
-                    }
-                });
-            }
-
-            $scope.draw = false;
-        };
-
-        $scope.startCollab = function (editor, minder) {
-
-            Messages.startWebsocket("7a3b61c2-1d6d-4791-a004-c2cce9547210");
-
-            var socketContent = {
-                "messageType": "Join",
-                "value": "XXX"
-            }
-            Messages.sendSock("collaboration", socketContent, function (data) {
-
-                if (data != {}) {
-
-                    if (data.messageType == "Join") {
-                        $scope.drawer = data.controller;
-                        $scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
-                    }
-                    else if (data.messageType == "Left") {
-                        $scope.drawer = data.controller;
-                        $scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
-
-                        try {
-                            var requireList = JSON.parse(data.requireList);
-                            for (var i = 0; i < requireList.length; i++) {
-                                if (requireList[i] == data.controller) {
-                                    $scope.leftApply = i;
-                                }
-                            }
-                        }
-                        catch (ex) {
-                            $scope.leftApply = 0;
-                        }
-                    }
-
-                }
-            });
-            $scope.collaboration = true;
-        };
-
-        $scope.stopCollab = function (editor, minder) {
-            Messages.endWebsocket();
-            $scope.collaboration = false;
-            $scope.draw = false;
-            $scope.participants = [];
-            $scope.drawer = "Nobody";
-        };
-
-        $scope.initEditor = function (editor, minder) {
-            window.editor = editor;
-            window.minder = minder;
-        };
-    });
-</script>
 
 </html>
