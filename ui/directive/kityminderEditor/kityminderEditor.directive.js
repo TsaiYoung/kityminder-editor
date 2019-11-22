@@ -20,17 +20,6 @@ angular.module('kityminderEditor')
 					minderService.executeCallback();
 				}
 
-				function getSocketConnect(data) {
-					// websocket
-					if (data != {}) {
-
-						if (data.messageType == "Message" && data.event == "contentchange") {
-							var mindmap = data.value
-							editor.minder.importJson(mindmap);
-						}
-					}
-				}
-
 				if (typeof (seajs) != 'undefined') {
 					/* global seajs */
 					seajs.config({
@@ -43,22 +32,52 @@ angular.module('kityminderEditor')
 						var editor = window.editor = new Editor($minderEditor);
 
 						if (window.localStorage.__dev_minder_content) {
-							editor.minder.importJson(JSON.parse(window.localStorage.__dev_minder_content));
+							// editor.minder.importJson(JSON.parse(window.localStorage.__dev_minder_content));
 						}
 
-						editor.minder.on('contentchange', function () {
-							window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());
+						/*** for collaboration * start ***/
+						function getSocketConnect(data) {
 
-							if (Messages.connection) {
-								// websocket
-								var socketContent = {
-									"messageType": "Message",
-									"event": "contentchange",
-									"value": window.localStorage.__dev_minder_content
+							if (data != {}) {
+								if (data.messageType == "Message" && data.event == "contentchange") {
+									var mindmap = JSON.parse(data.value);
+									editor.minder.importJson(mindmap);
+									window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());
 								}
-								Messages.sendSock("mindmap", socketContent, getSocketConnect);
 							}
+						}
+						editor.minder.on('contentchange', function () {
+							// window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());							
 						});
+
+						function contentListening() {
+
+							if (window.localStorage.__dev_minder_content !== JSON.stringify(editor.minder.exportJson())) {
+								window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());
+
+								if (Messages.isConnection()) {
+									// websocket
+									var socketContent = {
+										"messageType": "Message",
+										"event": "contentchange",
+										"value": window.localStorage.__dev_minder_content
+									}
+									Messages.sendSock("mindmap", socketContent, getSocketConnect);
+								}
+							}
+
+							//心跳机制
+							if (Messages.isConnection()) {
+								var socketContent = {
+									"messageType": "Ping",
+									"event": "pong"
+								}
+								Messages.sendSock("ping", socketContent, getSocketConnect);
+
+							}
+						}
+						setInterval(contentListening, 1000);
+						/*** for collaboration * end ***/
 
 						window.minder = window.km = editor.minder;
 

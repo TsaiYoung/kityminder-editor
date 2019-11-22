@@ -5,7 +5,7 @@ angular.module('kityminderEditor')
             templateUrl: 'ui/directive/fileImport/fileImport.html',
             scope: {
                 minder: '=',
-                mindmapRes:'=?'
+                mindmapRes: '=?'
             },
             replace: true,
             link: function (scope) {
@@ -17,35 +17,41 @@ angular.module('kityminderEditor')
                     var maps = [];
 
                     var info = RouteInfo.getInfo();
-                    var folderId = info.pageId;
-                    try {
-                        $.ajax({
-                            url: 'http://localhost:8081/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
-                            type: "GET",
-                            async: false,
-                            success: function (data) {
-                                if (data == "Fail") {
-                                    console.log(data);
-                                }
-                                else if (data.files.length != undefined) {
+                    if (info.pageId != "") {
 
-                                    console.log("success!");
-                                    for (var i = 0; i < data.files.length; i++) {
-                                        if (data.files[i].type == "others") {
-                                            maps.push(data.files[i]);
-                                        }
+                        var folderId = info.pageId;
+                        try {
+                            $.ajax({
+                                url: 'http://localhost:8081/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
+                                type: "GET",
+                                async: false,
+                                success: function (data) {
+                                    if (data == "Fail") {
+                                        console.log(data);
                                     }
-                                    scope.mindmapRes = maps;
-                                }
+                                    else if (data.files.length != undefined) {
 
-                            },
-                            error: function (err) {
-                                console.log("fail.");
-                            }
-                        });
+                                        console.log("success!");
+                                        for (var i = 0; i < data.files.length; i++) {
+                                            if (data.files[i].type == "others") {
+                                                maps.push(data.files[i]);
+                                            }
+                                        }
+                                        scope.mindmapRes = maps;
+                                    }
+
+                                },
+                                error: function (err) {
+                                    console.log("fail.");
+                                }
+                            });
+                        }
+                        catch (ex) {
+                            console.log("fail")
+                        }
                     }
-                    catch (ex) {
-                        console.log("fail")
+                    else {
+                        alert("Wrong url!");
                     }
                 }
 

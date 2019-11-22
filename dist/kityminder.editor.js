@@ -1,6 +1,6 @@
 /*!
  * ====================================================
- * kityminder-editor - v1.0.67 - 2019-11-15
+ * kityminder-editor - v1.0.67 - 2019-11-22
  * https://github.com/fex-team/kityminder-editor
  * GitHub: https://github.com/fex-team/kityminder-editor 
  * Copyright (c) 2019 ; Licensed 
@@ -2090,7 +2090,7 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/collabPanel/collabPanel.html',
-    "<div style=\"float: right; max-width: 800px\"><span class=\"glyphicon glyphicon-link\" aria-hidden=\"true\" title=\"Click it and start collaboration\" ng-show=\"!collaboration\" style=\"margin-left: 10px;cursor:pointer;margin-right: 30px\" ng-click=\"startCollab()\"></span> <span class=\"glyphicon glyphicon-globe\" aria-hidden=\"true\" title=\"Click it and stop collaboration\" ng-show=\"collaboration\" style=\"margin-left: 10px;cursor:pointer;margin-right: 30px\" ng-click=\"stopCollab()\"></span> <span class=\"glyphicon glyphicon-pencil\" aria-hidden=\"true\" title=\"Apply to draw the mind map\" ng-show=\"!draw\" style=\"cursor:pointer;margin-right: 20px\" ng-click=\"applyCtrl()\"></span> <span class=\"glyphicon glyphicon-refresh\" aria-hidden=\"true\" title=\"Give up to draw the mind map\" ng-show=\"draw\" style=\"cursor:pointer;margin-right: 20px\" ng-click=\"giveupCtrl()\"></span> <span class=\"glyphicon glyphicon-user\" aria-hidden=\"true\" title=\"{{drawer}} is drawing the mind map\" style=\"margin-right: 10px\" ng-show=\"draw\"></span> <span ng-show=\"draw\" style=\"margin-right: 20px;margin-left: 10px\">{{leftApply}} people waiting for drawing.</span> <span class=\"glyphicon glyphicon-user\" aria-hidden=\"true\" ng-repeat=\"user in participants\" title=\"{{user}}\" style=\"margin-right: 15px\"></span></div>"
+    "<div style=\"float: right; max-width: 800px\"><span class=\"glyphicon glyphicon-link\" aria-hidden=\"true\" title=\"Click it and start collaboration\" ng-show=\"!collaboration\" style=\"margin-left: 10px;cursor:pointer;margin-right: 30px\" ng-click=\"startCollab()\"></span> <span class=\"glyphicon glyphicon-globe\" aria-hidden=\"true\" title=\"Click it and stop collaboration\" ng-show=\"collaboration\" style=\"margin-left: 10px;cursor:pointer;margin-right: 30px\" ng-click=\"stopCollab()\"></span> <span class=\"glyphicon glyphicon-pencil\" aria-hidden=\"true\" title=\"Apply to draw the mind map\" ng-show=\"!draw\" style=\"cursor:pointer;margin-right: 20px\" ng-click=\"applyCtrl()\"></span> <span class=\"glyphicon glyphicon-refresh\" id=\"giveup-ctrl\" aria-hidden=\"true\" title=\"Give up to draw the mind map\" ng-show=\"draw\" style=\"cursor:pointer;margin-right: 20px\" ng-click=\"giveupCtrl()\"></span> <span class=\"glyphicon glyphicon-user\" aria-hidden=\"true\" title=\"{{drawer}} is drawing the mind map\" style=\"margin-right: 10px\" ng-show=\"draw\"></span> <span ng-show=\"draw\" style=\"margin-right: 20px;margin-left: 10px\">{{leftApply}} people waiting for drawing.</span> <span class=\"glyphicon glyphicon-user\" aria-hidden=\"true\" ng-repeat=\"user in participants\" title=\"{{user}}\" style=\"margin-right: 15px\"></span></div>"
   );
 
 
@@ -3365,9 +3365,10 @@ angular.module('kityminderEditor')
 
                 scope.participants = [];  // 在线用户列表
                 scope.drawer = "Nobody";    // 画图者
+                var drawerId = "";
                 scope.collaboration = false;  //是否协同
                 scope.draw = false;           //是否请求画图
-                scope.leftApply = 0;
+                scope.leftApply = -1;
 
                 scope.applyCtrl = applyCtrl;
                 scope.giveupCtrl = giveupCtrl;
@@ -3375,128 +3376,175 @@ angular.module('kityminderEditor')
                 scope.stopCollab = stopCollab;
 
                 function applyCtrl() {
-                    if (Messages.isConnection && scope.collaboration) {
+                    if (Messages.isConnection() && scope.collaboration) {
 
-                        var socketContent = {
-                            "messageType": "Authority",
-                            "value": "Require"
-                        }
-                        Messages.sendSock("collaboration", socketContent, function (data) {
-                            if (data != {}) {
+                        var info = RouteInfo.getInfo();
 
-                                if (data.messageType == "Authority") {
-                                    scope.drawer = data.controller;
-                                    scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                        if (info.userName != "" && info.userId != "") {
 
-                                    try {
-                                        var requireList = JSON.parse(data.requireList);
-                                        for (var i = 0; i < requireList.length; i++) {
-                                            if (requireList[i] == data.controller) {
-                                                scope.leftApply = i;
+                            var socketContent = {
+                                "messageType": "Authority",
+                                "value": "Require",
+                                "userName": info.userName,
+                                "userId": info.userId
+                            }
+                            Messages.sendSock("collaboration", socketContent, function (data) {
+                                if (data != {}) {
+
+                                    if (data.messageType == "Authority") {
+                                        scope.drawer = JSON.parse(data.controller).userName;
+                                        drawerId = JSON.parse(data.controller).userId;
+                                        //当等待队列为零，解除屏蔽操作
+                                        if (drawerId == info.userId) {
+                                            document.getElementById("edit-mask").style.display = "none";
+                                            document.getElementById("giveup-ctrl").style.cursor = "pointer";
+                                        }
+                                        else{
+                                            document.getElementById("giveup-ctrl").style.cursor = "not-allowed";
+                                        }
+
+                                        scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+
+                                        try {
+                                            var requireList = JSON.parse(data.requireList);
+                                            for (var i = 0; i < requireList.length; i++) {
+                                                if (requireList[i].userId == info.userId) {
+                                                    scope.leftApply = i;
+                                                }
                                             }
                                         }
-                                    }
-                                    catch (ex) {
-                                        scope.leftApply = 0;
-                                    }
-                                } else if (data.messageType == "Left") {
-                                    scope.drawer = data.controller;
-                                    scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                        catch (ex) {
+                                            scope.leftApply = -1;
+                                        }
+                                    } else if (data.messageType == "Left") {
+                                        scope.drawer = JSON.parse(data.controller).userName;
+                                        drawerId = JSON.parse(data.controller).userId;
+                                        //当等待队列为零，解除屏蔽操作
+                                        if (drawerId == info.userId) {
+                                            document.getElementById("edit-mask").style.display = "none";
+                                            document.getElementById("giveup-ctrl").style.cursor = "pointer";
+                                        }
+                                        else{
+                                            document.getElementById("giveup-ctrl").style.cursor = "not-allowed";
+                                        }
 
-                                    try {
-                                        var requireList = JSON.parse(data.requireList);
-                                        for (var i = 0; i < requireList.length; i++) {
-                                            if (requireList[i] == data.controller) {
-                                                scope.leftApply = i;
+                                        scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+
+                                        try {
+                                            var requireList = JSON.parse(data.requireList);
+                                            for (var i = 0; i < requireList.length; i++) {
+                                                if (requireList[i].userId == info.userId) {
+                                                    scope.leftApply = i;
+                                                }
                                             }
                                         }
-                                    }
-                                    catch (ex) {
-                                        scope.leftApply = 0;
+                                        catch (ex) {
+                                            scope.leftApply = -1;
+                                        }
                                     }
                                 }
-                            }
-                        });
+                            });
 
-                        scope.draw = true;
+                            scope.draw = true;
+                        }
+                        else {
+                            alert("Wrong url!");
+                        }
                     }
                 }
 
                 function giveupCtrl() {
-                    if (Messages.isConnection) {
+                    var info = RouteInfo.getInfo();
+                    if (drawerId == info.userId) {
+                        if (Messages.isConnection()) {
 
-                        var socketContent = {
-                            "messageType": "Authority",
-                            "value": "Release"
-                        }
-                        Messages.sendSock("collaboration", socketContent, function (data) {
-                            if (data != {}) {
+                            document.getElementById("edit-mask").style.display = ""; //屏蔽操作
 
-                                if (data.messageType == "Authority") {
+                            var socketContent = {
+                                "messageType": "Authority",
+                                "value": "Release"
+                            }
+                            Messages.sendSock("collaboration", socketContent, function (data) {
+                                if (data != {}) {
 
-                                    scope.drawer = data.controller;
-                                    scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                    if (data.messageType == "Authority") {
 
-                                } else if (data.messageType == "Left") {
-                                    scope.drawer = data.controller;
-                                    scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                        scope.drawer = JSON.parse(data.controller).userName;
+                                        drawerId = JSON.parse(data.controller).userId;
+                                        scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
 
-                                    try {
-                                        var requireList = JSON.parse(data.requireList);
-                                        for (var i = 0; i < requireList.length; i++) {
-                                            if (requireList[i] == data.controller) {
-                                                scope.leftApply = i;
+                                    } else if (data.messageType == "Left") {
+                                        scope.drawer = JSON.parse(data.controller).userName;
+                                        drawerId = JSON.parse(data.controller).userId;
+                                        scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+
+                                        try {
+                                            var requireList = JSON.parse(data.requireList);
+                                            for (var i = 0; i < requireList.length; i++) {
+                                                if (requireList[i].userId == info.userId) {
+                                                    scope.leftApply = i;
+                                                }
                                             }
                                         }
+                                        catch (ex) {
+                                            scope.leftApply = 0;
+                                        }
                                     }
-                                    catch (ex) {
-                                        scope.leftApply = 0;
-                                    }
-                                }
 
-                            }
-                        });
+                                }
+                            });
+                        }
+                        scope.draw = false;
                     }
-                    scope.draw = false;
                 }
 
                 function startCollab() {
 
                     var info = RouteInfo.getInfo();
-                    Messages.startWebsocket(info.pageId);
 
-                    var socketContent = {
-                        "messageType": "Join",
-                        "value": info.userName
-                    }
-                    Messages.sendSock("collaboration", socketContent, function (data) {
+                    if (info.pageId != "" && info.userId != "" && info.userName != "") {
+                        Messages.startWebsocket(info.pageId);
 
-                        if (data != {}) {
+                        var socketContent = {
+                            "messageType": "Join",
+                            "userId": info.userId,
+                            "userName": info.userName
+                        }
+                        Messages.sendSock("collaboration", socketContent, function (data) {
 
-                            if (data.messageType == "Join") {
-                                scope.drawer = data.controller;
-                                scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                            if (data != {}) {
 
-                                scope.collaboration = true;
-                            }
-                            else if (data.messageType == "Left") {
-                                scope.drawer = data.controller;
-                                scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                if (data.messageType == "Join") {
+                                    scope.drawer = JSON.parse(data.controller).userName;
+                                    drawerId = JSON.parse(data.controller).userId;
+                                    scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
 
-                                try {
-                                    var requireList = JSON.parse(data.requireList);
-                                    for (var i = 0; i < requireList.length; i++) {
-                                        if (requireList[i] == data.controller) {
-                                            scope.leftApply = i;
+                                    scope.collaboration = true;
+                                    document.getElementById("edit-mask").style.display = ""; //屏蔽操作
+                                }
+                                else if (data.messageType == "Left") {
+                                    scope.drawer = JSON.parse(data.controller).userName;
+                                    drawerId = JSON.parse(data.controller).userId;
+                                    scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+
+                                    try {
+                                        var requireList = JSON.parse(data.requireList);
+                                        for (var i = 0; i < requireList.length; i++) {
+                                            if (requireList[i].userId == info.userId) {
+                                                scope.leftApply = i;
+                                            }
                                         }
                                     }
-                                }
-                                catch (ex) {
-                                    scope.leftApply = 0;
+                                    catch (ex) {
+                                        scope.leftApply = 0;
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
+                    }
+                    else {
+                        alert("Wrong url!");
+                    }
                 }
 
                 function stopCollab() {
@@ -3505,6 +3553,7 @@ angular.module('kityminderEditor')
                     scope.draw = false;
                     scope.participants = [];
                     scope.drawer = "Nobody";
+                    document.getElementById("edit-mask").style.display = "none"; //解除屏蔽操作
                 }
             }
         }
@@ -3564,7 +3613,7 @@ angular.module('kityminderEditor')
             templateUrl: 'ui/directive/fileImport/fileImport.html',
             scope: {
                 minder: '=',
-                mindmapRes:'=?'
+                mindmapRes: '=?'
             },
             replace: true,
             link: function (scope) {
@@ -3576,35 +3625,41 @@ angular.module('kityminderEditor')
                     var maps = [];
 
                     var info = RouteInfo.getInfo();
-                    var folderId = info.pageId;
-                    try {
-                        $.ajax({
-                            url: 'http://localhost:8081/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
-                            type: "GET",
-                            async: false,
-                            success: function (data) {
-                                if (data == "Fail") {
-                                    console.log(data);
-                                }
-                                else if (data.files.length != undefined) {
+                    if (info.pageId != "") {
 
-                                    console.log("success!");
-                                    for (var i = 0; i < data.files.length; i++) {
-                                        if (data.files[i].type == "others") {
-                                            maps.push(data.files[i]);
-                                        }
+                        var folderId = info.pageId;
+                        try {
+                            $.ajax({
+                                url: 'http://localhost:8081/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
+                                type: "GET",
+                                async: false,
+                                success: function (data) {
+                                    if (data == "Fail") {
+                                        console.log(data);
                                     }
-                                    scope.mindmapRes = maps;
-                                }
+                                    else if (data.files.length != undefined) {
 
-                            },
-                            error: function (err) {
-                                console.log("fail.");
-                            }
-                        });
+                                        console.log("success!");
+                                        for (var i = 0; i < data.files.length; i++) {
+                                            if (data.files[i].type == "others") {
+                                                maps.push(data.files[i]);
+                                            }
+                                        }
+                                        scope.mindmapRes = maps;
+                                    }
+
+                                },
+                                error: function (err) {
+                                    console.log("fail.");
+                                }
+                            });
+                        }
+                        catch (ex) {
+                            console.log("fail")
+                        }
                     }
-                    catch (ex) {
-                        console.log("fail")
+                    else {
+                        alert("Wrong url!");
                     }
                 }
 
@@ -3711,44 +3766,49 @@ angular.module('kityminderEditor')
                         editor.minder.exportData(exportType).then(function (content) {
 
                             var info = RouteInfo.getInfo();
+                            if (info.pageId != "" && info.userId != "") {
 
-                            // 文件上传
-                            var blob = new Blob([content]);
-                            var filename = $('#mindmapName').val() + '.' + datatype;
-                            var fileBlob = new File([blob], filename);
+                                // 文件上传
+                                var blob = new Blob([content]);
+                                var filename = $('#mindmapName').val() + '.' + datatype;
+                                var fileBlob = new File([blob], filename);
 
-                            var formData = new FormData();
-                            formData.append("file", fileBlob);
-                            formData.append("description", "Collaborative mindmap tool");
-                            formData.append("type", "others");
-                            formData.append("uploaderId", info.userId);
-                            formData.append("privacy", "private");
-                            formData.append("folderId", info.pageId);
+                                var formData = new FormData();
+                                formData.append("file", fileBlob);
+                                formData.append("description", "Collaborative mindmap tool");
+                                formData.append("type", "others");
+                                formData.append("uploaderId", info.userId);
+                                formData.append("privacy", "private");
+                                formData.append("folderId", info.pageId);
 
-                            try {
-                                $.ajax({
-                                    url: 'http://localhost:8081/GeoProblemSolving/folder/uploadToFolder',
-                                    type: "POST",
-                                    data: formData,
-                                    processData: false,
-                                    contentType: false,
-                                    success: function (data) {
-                                        if (data == "Size over" || data == "Fail" || data == "Offline") {
-                                            console.log(data);
+                                try {
+                                    $.ajax({
+                                        url: 'http://localhost:8081/GeoProblemSolving/folder/uploadToFolder',
+                                        type: "POST",
+                                        data: formData,
+                                        processData: false,
+                                        contentType: false,
+                                        success: function (data) {
+                                            if (data == "Size over" || data == "Fail" || data == "Offline") {
+                                                console.log(data);
+                                            }
+                                            else if (data.uploaded.length > 0) {
+                                                alert("Save this mind map successfully");
+                                                // update $scope.mindmapRes
+                                                scope
+                                            }
+                                        },
+                                        error: function (err) {
+                                            console.log("fail.");
                                         }
-                                        else if (data.uploaded.length > 0) {
-                                            alert("Save this mind map successfully");
-                                            // update $scope.mindmapRes
-                                            scope
-                                        }
-                                    },
-                                    error: function (err) {
-                                        console.log("fail.");
-                                    }
-                                });
+                                    });
+                                }
+                                catch (ex) {
+                                    console.log("fail")
+                                }
                             }
-                            catch (ex) {
-                                console.log("fail")
+                            else {
+                                alert("Wrong url!");
                             }
 
                         });
@@ -3982,17 +4042,6 @@ angular.module('kityminderEditor')
 					minderService.executeCallback();
 				}
 
-				function getSocketConnect(data) {
-					// websocket
-					if (data != {}) {
-
-						if (data.messageType == "Message" && data.event == "contentchange") {
-							var mindmap = data.value
-							editor.minder.importJson(mindmap);
-						}
-					}
-				}
-
 				if (typeof (seajs) != 'undefined') {
 					/* global seajs */
 					seajs.config({
@@ -4005,22 +4054,52 @@ angular.module('kityminderEditor')
 						var editor = window.editor = new Editor($minderEditor);
 
 						if (window.localStorage.__dev_minder_content) {
-							editor.minder.importJson(JSON.parse(window.localStorage.__dev_minder_content));
+							// editor.minder.importJson(JSON.parse(window.localStorage.__dev_minder_content));
 						}
 
-						editor.minder.on('contentchange', function () {
-							window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());
+						/*** for collaboration * start ***/
+						function getSocketConnect(data) {
 
-							if (Messages.connection) {
-								// websocket
-								var socketContent = {
-									"messageType": "Message",
-									"event": "contentchange",
-									"value": window.localStorage.__dev_minder_content
+							if (data != {}) {
+								if (data.messageType == "Message" && data.event == "contentchange") {
+									var mindmap = JSON.parse(data.value);
+									editor.minder.importJson(mindmap);
+									window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());
 								}
-								Messages.sendSock("mindmap", socketContent, getSocketConnect);
 							}
+						}
+						editor.minder.on('contentchange', function () {
+							// window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());							
 						});
+
+						function contentListening() {
+
+							if (window.localStorage.__dev_minder_content !== JSON.stringify(editor.minder.exportJson())) {
+								window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());
+
+								if (Messages.isConnection()) {
+									// websocket
+									var socketContent = {
+										"messageType": "Message",
+										"event": "contentchange",
+										"value": window.localStorage.__dev_minder_content
+									}
+									Messages.sendSock("mindmap", socketContent, getSocketConnect);
+								}
+							}
+
+							//心跳机制
+							if (Messages.isConnection()) {
+								var socketContent = {
+									"messageType": "Ping",
+									"event": "pong"
+								}
+								Messages.sendSock("ping", socketContent, getSocketConnect);
+
+							}
+						}
+						setInterval(contentListening, 1000);
+						/*** for collaboration * end ***/
 
 						window.minder = window.km = editor.minder;
 

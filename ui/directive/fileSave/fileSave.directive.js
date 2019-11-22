@@ -30,44 +30,49 @@ angular.module('kityminderEditor')
                         editor.minder.exportData(exportType).then(function (content) {
 
                             var info = RouteInfo.getInfo();
+                            if (info.pageId != "" && info.userId != "") {
 
-                            // 文件上传
-                            var blob = new Blob([content]);
-                            var filename = $('#mindmapName').val() + '.' + datatype;
-                            var fileBlob = new File([blob], filename);
+                                // 文件上传
+                                var blob = new Blob([content]);
+                                var filename = $('#mindmapName').val() + '.' + datatype;
+                                var fileBlob = new File([blob], filename);
 
-                            var formData = new FormData();
-                            formData.append("file", fileBlob);
-                            formData.append("description", "Collaborative mindmap tool");
-                            formData.append("type", "others");
-                            formData.append("uploaderId", info.userId);
-                            formData.append("privacy", "private");
-                            formData.append("folderId", info.pageId);
+                                var formData = new FormData();
+                                formData.append("file", fileBlob);
+                                formData.append("description", "Collaborative mindmap tool");
+                                formData.append("type", "others");
+                                formData.append("uploaderId", info.userId);
+                                formData.append("privacy", "private");
+                                formData.append("folderId", info.pageId);
 
-                            try {
-                                $.ajax({
-                                    url: 'http://localhost:8081/GeoProblemSolving/folder/uploadToFolder',
-                                    type: "POST",
-                                    data: formData,
-                                    processData: false,
-                                    contentType: false,
-                                    success: function (data) {
-                                        if (data == "Size over" || data == "Fail" || data == "Offline") {
-                                            console.log(data);
+                                try {
+                                    $.ajax({
+                                        url: 'http://localhost:8081/GeoProblemSolving/folder/uploadToFolder',
+                                        type: "POST",
+                                        data: formData,
+                                        processData: false,
+                                        contentType: false,
+                                        success: function (data) {
+                                            if (data == "Size over" || data == "Fail" || data == "Offline") {
+                                                console.log(data);
+                                            }
+                                            else if (data.uploaded.length > 0) {
+                                                alert("Save this mind map successfully");
+                                                // update $scope.mindmapRes
+                                                scope
+                                            }
+                                        },
+                                        error: function (err) {
+                                            console.log("fail.");
                                         }
-                                        else if (data.uploaded.length > 0) {
-                                            alert("Save this mind map successfully");
-                                            // update $scope.mindmapRes
-                                            scope
-                                        }
-                                    },
-                                    error: function (err) {
-                                        console.log("fail.");
-                                    }
-                                });
+                                    });
+                                }
+                                catch (ex) {
+                                    console.log("fail")
+                                }
                             }
-                            catch (ex) {
-                                console.log("fail")
+                            else {
+                                alert("Wrong url!");
                             }
 
                         });

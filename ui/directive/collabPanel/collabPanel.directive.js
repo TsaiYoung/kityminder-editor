@@ -15,9 +15,10 @@ angular.module('kityminderEditor')
 
                 scope.participants = [];  // 在线用户列表
                 scope.drawer = "Nobody";    // 画图者
+                var drawerId = "";
                 scope.collaboration = false;  //是否协同
                 scope.draw = false;           //是否请求画图
-                scope.leftApply = 0;
+                scope.leftApply = -1;
 
                 scope.applyCtrl = applyCtrl;
                 scope.giveupCtrl = giveupCtrl;
@@ -25,128 +26,175 @@ angular.module('kityminderEditor')
                 scope.stopCollab = stopCollab;
 
                 function applyCtrl() {
-                    if (Messages.isConnection && scope.collaboration) {
+                    if (Messages.isConnection() && scope.collaboration) {
 
-                        var socketContent = {
-                            "messageType": "Authority",
-                            "value": "Require"
-                        }
-                        Messages.sendSock("collaboration", socketContent, function (data) {
-                            if (data != {}) {
+                        var info = RouteInfo.getInfo();
 
-                                if (data.messageType == "Authority") {
-                                    scope.drawer = data.controller;
-                                    scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                        if (info.userName != "" && info.userId != "") {
 
-                                    try {
-                                        var requireList = JSON.parse(data.requireList);
-                                        for (var i = 0; i < requireList.length; i++) {
-                                            if (requireList[i] == data.controller) {
-                                                scope.leftApply = i;
+                            var socketContent = {
+                                "messageType": "Authority",
+                                "value": "Require",
+                                "userName": info.userName,
+                                "userId": info.userId
+                            }
+                            Messages.sendSock("collaboration", socketContent, function (data) {
+                                if (data != {}) {
+
+                                    if (data.messageType == "Authority") {
+                                        scope.drawer = JSON.parse(data.controller).userName;
+                                        drawerId = JSON.parse(data.controller).userId;
+                                        //当等待队列为零，解除屏蔽操作
+                                        if (drawerId == info.userId) {
+                                            document.getElementById("edit-mask").style.display = "none";
+                                            document.getElementById("giveup-ctrl").style.cursor = "pointer";
+                                        }
+                                        else{
+                                            document.getElementById("giveup-ctrl").style.cursor = "not-allowed";
+                                        }
+
+                                        scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+
+                                        try {
+                                            var requireList = JSON.parse(data.requireList);
+                                            for (var i = 0; i < requireList.length; i++) {
+                                                if (requireList[i].userId == info.userId) {
+                                                    scope.leftApply = i;
+                                                }
                                             }
                                         }
-                                    }
-                                    catch (ex) {
-                                        scope.leftApply = 0;
-                                    }
-                                } else if (data.messageType == "Left") {
-                                    scope.drawer = data.controller;
-                                    scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                        catch (ex) {
+                                            scope.leftApply = -1;
+                                        }
+                                    } else if (data.messageType == "Left") {
+                                        scope.drawer = JSON.parse(data.controller).userName;
+                                        drawerId = JSON.parse(data.controller).userId;
+                                        //当等待队列为零，解除屏蔽操作
+                                        if (drawerId == info.userId) {
+                                            document.getElementById("edit-mask").style.display = "none";
+                                            document.getElementById("giveup-ctrl").style.cursor = "pointer";
+                                        }
+                                        else{
+                                            document.getElementById("giveup-ctrl").style.cursor = "not-allowed";
+                                        }
 
-                                    try {
-                                        var requireList = JSON.parse(data.requireList);
-                                        for (var i = 0; i < requireList.length; i++) {
-                                            if (requireList[i] == data.controller) {
-                                                scope.leftApply = i;
+                                        scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+
+                                        try {
+                                            var requireList = JSON.parse(data.requireList);
+                                            for (var i = 0; i < requireList.length; i++) {
+                                                if (requireList[i].userId == info.userId) {
+                                                    scope.leftApply = i;
+                                                }
                                             }
                                         }
-                                    }
-                                    catch (ex) {
-                                        scope.leftApply = 0;
+                                        catch (ex) {
+                                            scope.leftApply = -1;
+                                        }
                                     }
                                 }
-                            }
-                        });
+                            });
 
-                        scope.draw = true;
+                            scope.draw = true;
+                        }
+                        else {
+                            alert("Wrong url!");
+                        }
                     }
                 }
 
                 function giveupCtrl() {
-                    if (Messages.isConnection) {
+                    var info = RouteInfo.getInfo();
+                    if (drawerId == info.userId) {
+                        if (Messages.isConnection()) {
 
-                        var socketContent = {
-                            "messageType": "Authority",
-                            "value": "Release"
-                        }
-                        Messages.sendSock("collaboration", socketContent, function (data) {
-                            if (data != {}) {
+                            document.getElementById("edit-mask").style.display = ""; //屏蔽操作
 
-                                if (data.messageType == "Authority") {
+                            var socketContent = {
+                                "messageType": "Authority",
+                                "value": "Release"
+                            }
+                            Messages.sendSock("collaboration", socketContent, function (data) {
+                                if (data != {}) {
 
-                                    scope.drawer = data.controller;
-                                    scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                    if (data.messageType == "Authority") {
 
-                                } else if (data.messageType == "Left") {
-                                    scope.drawer = data.controller;
-                                    scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                        scope.drawer = JSON.parse(data.controller).userName;
+                                        drawerId = JSON.parse(data.controller).userId;
+                                        scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
 
-                                    try {
-                                        var requireList = JSON.parse(data.requireList);
-                                        for (var i = 0; i < requireList.length; i++) {
-                                            if (requireList[i] == data.controller) {
-                                                scope.leftApply = i;
+                                    } else if (data.messageType == "Left") {
+                                        scope.drawer = JSON.parse(data.controller).userName;
+                                        drawerId = JSON.parse(data.controller).userId;
+                                        scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+
+                                        try {
+                                            var requireList = JSON.parse(data.requireList);
+                                            for (var i = 0; i < requireList.length; i++) {
+                                                if (requireList[i].userId == info.userId) {
+                                                    scope.leftApply = i;
+                                                }
                                             }
                                         }
+                                        catch (ex) {
+                                            scope.leftApply = 0;
+                                        }
                                     }
-                                    catch (ex) {
-                                        scope.leftApply = 0;
-                                    }
-                                }
 
-                            }
-                        });
+                                }
+                            });
+                        }
+                        scope.draw = false;
                     }
-                    scope.draw = false;
                 }
 
                 function startCollab() {
 
                     var info = RouteInfo.getInfo();
-                    Messages.startWebsocket(info.pageId);
 
-                    var socketContent = {
-                        "messageType": "Join",
-                        "value": info.userName
-                    }
-                    Messages.sendSock("collaboration", socketContent, function (data) {
+                    if (info.pageId != "" && info.userId != "" && info.userName != "") {
+                        Messages.startWebsocket(info.pageId);
 
-                        if (data != {}) {
+                        var socketContent = {
+                            "messageType": "Join",
+                            "userId": info.userId,
+                            "userName": info.userName
+                        }
+                        Messages.sendSock("collaboration", socketContent, function (data) {
 
-                            if (data.messageType == "Join") {
-                                scope.drawer = data.controller;
-                                scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                            if (data != {}) {
 
-                                scope.collaboration = true;
-                            }
-                            else if (data.messageType == "Left") {
-                                scope.drawer = data.controller;
-                                scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                if (data.messageType == "Join") {
+                                    scope.drawer = JSON.parse(data.controller).userName;
+                                    drawerId = JSON.parse(data.controller).userId;
+                                    scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
 
-                                try {
-                                    var requireList = JSON.parse(data.requireList);
-                                    for (var i = 0; i < requireList.length; i++) {
-                                        if (requireList[i] == data.controller) {
-                                            scope.leftApply = i;
+                                    scope.collaboration = true;
+                                    document.getElementById("edit-mask").style.display = ""; //屏蔽操作
+                                }
+                                else if (data.messageType == "Left") {
+                                    scope.drawer = JSON.parse(data.controller).userName;
+                                    drawerId = JSON.parse(data.controller).userId;
+                                    scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+
+                                    try {
+                                        var requireList = JSON.parse(data.requireList);
+                                        for (var i = 0; i < requireList.length; i++) {
+                                            if (requireList[i].userId == info.userId) {
+                                                scope.leftApply = i;
+                                            }
                                         }
                                     }
-                                }
-                                catch (ex) {
-                                    scope.leftApply = 0;
+                                    catch (ex) {
+                                        scope.leftApply = 0;
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
+                    }
+                    else {
+                        alert("Wrong url!");
+                    }
                 }
 
                 function stopCollab() {
@@ -155,6 +203,7 @@ angular.module('kityminderEditor')
                     scope.draw = false;
                     scope.participants = [];
                     scope.drawer = "Nobody";
+                    document.getElementById("edit-mask").style.display = "none"; //解除屏蔽操作
                 }
             }
         }
