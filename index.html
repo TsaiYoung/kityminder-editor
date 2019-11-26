@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Collaborative mindmap tool</title>
+    <title>Collaborative mindmap tool - Powered by KityMinder-Editor</title>
 
     <link href="favicon.ico" type="image/x-icon" rel="shortcut icon">
 
@@ -40,6 +40,21 @@
 
         .nav-bar {
             background: #57a3f3
+        }
+
+        #collaPanel {
+            position: relative;
+            display: -ms-flexbox;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            background-color: #fff;
+            background-clip: border-box;
+            border: 1px solid rgba(0, 0, 0, .125);
+            border-radius: .25rem;
+            padding: 0 10px;
+            margin-right: 15px;
         }
     </style>
 </head>
@@ -126,6 +141,10 @@
 
 <script>
     // 'use strict';
+
+    // 思维导图ID，标注唯一性
+    var mindmapInfo = {};
+
     var app = angular.module('kityminderDemo', ['kityminderEditor', 'ngWebSocket']);
 
     app.factory('RouteInfo', function () {
@@ -133,7 +152,8 @@
         var pageId = "", userId = "", userName = "";
 
         var href = window.location.href;
-        var url = href.split('&')
+        var url = href.split('&');
+        var IP_Port = window.location.host;
 
         for (var i = 0; i < url.length; i++) {
 
@@ -161,13 +181,16 @@
                     "pageId": pageId
                 }
                 return info;
+            },
+            getIPPort: function () {
+                return IP_Port;
             }
         }
 
         return methods;
     });
 
-    app.factory('Messages', function ($websocket) {
+    app.factory('Messages', function ($websocket, RouteInfo) {
 
         var connection = false;
         var msgType = "";
@@ -182,7 +205,8 @@
 
         function startWebsocket(roomId) {
 
-            var wsUrl = "ws://localhost:8081/GeoProblemSolving/Mindmap/" + roomId;
+            var wsUrl = "ws://"+RouteInfo.getIPPort()+"/GeoProblemSolving/Mindmap/" + roomId;
+            // var wsUrl = "ws://localhost:8081/GeoProblemSolving/Mindmap/" + roomId;
             dataStream = $websocket(wsUrl);
 
             dataStream.onOpen(function (msg) {

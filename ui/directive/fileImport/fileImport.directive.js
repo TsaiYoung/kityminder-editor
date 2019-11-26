@@ -22,7 +22,7 @@ angular.module('kityminderEditor')
                         var folderId = info.pageId;
                         try {
                             $.ajax({
-                                url: 'http://localhost:8081/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
+                                url: 'http://'+RouteInfo.getIPPort()+'/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
                                 type: "GET",
                                 async: false,
                                 success: function (data) {
@@ -82,6 +82,8 @@ angular.module('kityminderEditor')
                             editor.minder.importData(fileType, content).then(function (data) {
                                 $(fileInput).val('');
                             });
+                            // 导图信息初始化
+                            mindmapInfo = {};
                         }
                         reader.readAsText(file);
                     }
@@ -105,7 +107,7 @@ angular.module('kityminderEditor')
 
                     try {
 
-                        var url = "http://localhost:8081" + map.pathURL;
+                        var url = "http://" + RouteInfo.getIPPort() + map.pathURL;
                         var xhr = new XMLHttpRequest();
                         xhr.open("GET", url, true);
                         xhr.onload = function (e) {
@@ -115,11 +117,17 @@ angular.module('kityminderEditor')
                                 editor.minder.importData(fileType, file).then(function (data) {
                                     $(fileInput).val('');
                                 });
+
+                                mindmapInfo = {
+                                    name: map.name,
+                                    resourceId: map.resourceId
+                                }
                             }
                         };
                         xhr.send();
                     }
                     catch (ex) {
+                        mindmapInfo = {};
                         console.log("import mindmap error");
                     }
                 }
