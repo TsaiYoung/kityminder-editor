@@ -15,7 +15,7 @@
         drawing.</span>
     <span data-toggle="modal" data-target="#onlineUsers"
         style=" max-width: 500px; overflow: hidden; cursor: pointer;">
-        <span class="glyphicon glyphicon-user" aria-hidden="true" ng-repeat="user in participants" title="{{user}}"
+        <span class="glyphicon glyphicon-user" aria-hidden="true" ng-repeat="user in participants" title="{{user.name}}"
             style="margin-left: 15px;margin-right: 5px;"></span>...
     </span>
     <!-- 模态框（Modal） -->
@@ -34,8 +34,8 @@
                 <div class="modal-body">
                     <div style="min-height: 100px;">
                         <div style="float:left; cursor: pointer;" id="collaPanel" ng-repeat="user in participants"
-                            ng-click="gotoUserspace()">
-                            <span class="glyphicon glyphicon-user" style="margin-right: 5px;"></span><span>{{user}}</span>
+                            ng-click="gotoUserspace(user.id)">
+                            <span class="glyphicon glyphicon-user" style="margin-right: 5px;"></span><span>{{user.name}}</span>
                         </div>
                     </div>
                 </div>

@@ -24,6 +24,7 @@ angular.module('kityminderEditor')
                 scope.giveupCtrl = giveupCtrl;
                 scope.startCollab = startCollab;
                 scope.stopCollab = stopCollab;
+                scope.gotoUserspace = gotoUserspace;
 
                 function applyCtrl() {
                     if (Messages.isConnection() && scope.collaboration) {
@@ -53,7 +54,7 @@ angular.module('kityminderEditor')
                                             document.getElementById("giveup-ctrl").style.cursor = "not-allowed";
                                         }
 
-                                        scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                        scope.participants = JSON.parse(data.userList);
 
                                         try {
                                             var requireList = JSON.parse(data.requireList);
@@ -78,7 +79,7 @@ angular.module('kityminderEditor')
                                             document.getElementById("giveup-ctrl").style.cursor = "not-allowed";
                                         }
 
-                                        scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                        scope.participants = JSON.parse(data.userList);
 
                                         try {
                                             var requireList = JSON.parse(data.requireList);
@@ -121,12 +122,12 @@ angular.module('kityminderEditor')
 
                                         scope.drawer = JSON.parse(data.controller).userName;
                                         drawerId = JSON.parse(data.controller).userId;
-                                        scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                        scope.participants = JSON.parse(data.userList);
 
                                     } else if (data.messageType == "Left") {
                                         scope.drawer = JSON.parse(data.controller).userName;
                                         drawerId = JSON.parse(data.controller).userId;
-                                        scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                        scope.participants = JSON.parse(data.userList);
 
                                         try {
                                             var requireList = JSON.parse(data.requireList);
@@ -167,7 +168,7 @@ angular.module('kityminderEditor')
                                 if (data.messageType == "Join") {
                                     scope.drawer = JSON.parse(data.controller).userName;
                                     drawerId = JSON.parse(data.controller).userId;
-                                    scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                    scope.participants = JSON.parse(data.userList);
 
                                     scope.collaboration = true;
                                     document.getElementById("edit-mask").style.display = ""; //屏蔽操作
@@ -175,7 +176,7 @@ angular.module('kityminderEditor')
                                 else if (data.messageType == "Left") {
                                     scope.drawer = JSON.parse(data.controller).userName;
                                     drawerId = JSON.parse(data.controller).userId;
-                                    scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                    scope.participants = JSON.parse(data.userList);
 
                                     try {
                                         var requireList = JSON.parse(data.requireList);
@@ -204,6 +205,18 @@ angular.module('kityminderEditor')
                     scope.participants = [];
                     scope.drawer = "Nobody";
                     document.getElementById("edit-mask").style.display = "none"; //解除屏蔽操作
+                }
+
+                function gotoUserspace(userId) {
+                    var info = RouteInfo.getInfo();
+                    var url = "";
+                    if(userId == info.userId){
+                        url = "http://"+RouteInfo.getIPPort()+"/personalPage";
+                    }
+                    else {
+                        url = "http://"+RouteInfo.getIPPort()+"/GeoProblemSolving/memberPage/"+userId;
+                    }
+                    window.location.href = url;
                 }
             }
         }

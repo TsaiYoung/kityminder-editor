@@ -154,6 +154,9 @@
         var href = window.location.href;
         var url = href.split('&');
         var IP_Port = window.location.host;
+        if(IP_Port == "localhost:8080" || IP_Port == "localhost:3000" ){
+            IP_Port = "localhost:8081";
+        }
 
         for (var i = 0; i < url.length; i++) {
 
