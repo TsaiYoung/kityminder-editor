@@ -111,7 +111,7 @@ angular.module('kityminderEditor')
                                 var formData = new FormData();
                                 formData.append("file", fileBlob);
                                 formData.append("description", "Collaborative mindmap tool");
-                                formData.append("type", "others");
+                                formData.append("type", "data");
                                 formData.append("uploaderId", info.userId);
                                 formData.append("privacy", "private");
                                 formData.append("folderId", info.pageId);

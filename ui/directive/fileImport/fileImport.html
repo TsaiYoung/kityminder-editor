@@ -1,6 +1,7 @@
 <div class="btn-group-vertical" dropdown is-open="isopen">
     <button type="button" class="btn btn-default import" title="{{ 'import' | lang:'ui' }}"
-        ng-class="{'active': isopen}" data-toggle="modal" data-target="#importModal" ng-click="updateMaplist()"></button>
+        ng-class="{'active': isopen}" data-toggle="modal" data-target="#importModal"
+        ng-click="updateMaplist()"></button>
     <button type="button" class="btn btn-default import-caption dropdown-toggle" data-toggle="modal"
         data-target="#importModal" title="{{ 'import' | lang:'ui' }}" ng-click="updateMaplist()">
         <span class="caption">{{ 'import' | lang:'ui' }}</span>
@@ -38,9 +39,12 @@
                                     <tr ng-repeat="item in mindmapRes">
                                         <td style="width: 30%;">{{item.name}}</td>
                                         <td style="width: 50%;">{{item.description}}</td>
-                                        <td style="width: 20%;"><span style="cursor:pointer"
-                                                class="glyphicon glyphicon-ok-circle" title="Load this mindmap"
-                                                ng-click="mapLoad(item)"></span></td>
+                                        <td style="width: 20%;">
+                                            <span style="cursor:pointer" class="glyphicon glyphicon-ok-circle"
+                                                title="Load this mindmap" ng-click="mapLoad(item)"></span>
+                                            <span style="cursor:pointer; margin-left: 20px;" class="glyphicon glyphicon-remove-circle"
+                                                title="Delete this mindmap" ng-click="deleteMap(item)"></span>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>

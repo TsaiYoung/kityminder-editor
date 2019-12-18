@@ -12,6 +12,7 @@ angular.module('kityminderEditor')
                 scope.updateMaplist = updateMaplist;
                 scope.mapImport = mapImport;
                 scope.mapLoad = mapLoad;
+                scope.deleteMap = deleteMap;
 
                 function updateMaplist() {
                     var maps = [];
@@ -22,7 +23,7 @@ angular.module('kityminderEditor')
                         var folderId = info.pageId;
                         try {
                             $.ajax({
-                                url: 'http://'+RouteInfo.getIPPort()+'/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
+                                url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
                                 type: "GET",
                                 async: false,
                                 success: function (data) {
@@ -33,7 +34,7 @@ angular.module('kityminderEditor')
 
                                         console.log("success!");
                                         for (var i = 0; i < data.files.length; i++) {
-                                            if (data.files[i].type == "others") {
+                                            if (data.files[i].type == "data") {
                                                 maps.push(data.files[i]);
                                             }
                                         }
@@ -129,6 +130,35 @@ angular.module('kityminderEditor')
                     catch (ex) {
                         mindmapInfo = {};
                         console.log("import mindmap error");
+                    }
+                }
+
+                function deleteMap(map) {
+                    try {
+                        var info = RouteInfo.getInfo();
+                        if (info.pageId != "") {
+
+                            var folderId = info.pageId;
+                            $.ajax({
+                                url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/removeFile?resourceId=' + map.resourceId + '&folderId=' + folderId,
+                                type: "GET",
+                                async: false,
+                                success: function (data) {
+                                    if (data == "Fail") {
+                                    }
+                                    else {
+                                        alert("Delete the mindmap successfully");
+                                        updateMaplist();
+                                    }
+                                },
+                                error: function (err) {
+                                    alert("Fail to delete the mindmap");
+                                }
+                            });
+                        }
+                    }
+                    catch (ex) {
+                        console.log("fail")
                     }
                 }
             }
