@@ -34,9 +34,7 @@ angular.module('kityminderEditor')
 
                                         console.log("success!");
                                         for (var i = 0; i < data.files.length; i++) {
-                                            if (data.files[i].type == "data") {
-                                                maps.push(data.files[i]);
-                                            }
+                                            maps.push(data.files[i]);
                                         }
                                         scope.mindmapRes = maps;
                                     }
