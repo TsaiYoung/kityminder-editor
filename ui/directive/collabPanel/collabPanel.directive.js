@@ -99,7 +99,7 @@ angular.module('kityminderEditor')
                             scope.draw = true;
                         }
                         else {
-                            alert("Wrong url!");
+                            alert("Missing user information, please log in!");
                         }
                     }
                 }
@@ -193,8 +193,11 @@ angular.module('kityminderEditor')
                             }
                         });
                     }
-                    else {
-                        alert("Wrong url!");
+                    else if(info.pageId != "" ){
+                        alert("Missing page information!");
+                    }
+                    else{                        
+                        alert("Missing user information, please log in!");
                     }
                 }
 

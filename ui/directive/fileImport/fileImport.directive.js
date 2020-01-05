@@ -50,7 +50,7 @@ angular.module('kityminderEditor')
                         }
                     }
                     else {
-                        alert("Wrong url!");
+                        alert("Missing page information!");
                     }
                 }
 
@@ -71,7 +71,7 @@ angular.module('kityminderEditor')
                                 break;
                             default:
                                 console.log("File not supported!");
-                                alert('only support data format(*.km, *.md, *.json)');
+                                alert('Only support data format(*.km, *.md, *.json)');
                                 return;
                         }
 
@@ -80,6 +80,9 @@ angular.module('kityminderEditor')
                             var content = reader.result;
                             editor.minder.importData(fileType, content).then(function (data) {
                                 $(fileInput).val('');
+
+                                // 初始化原始导图
+                                originalMap = JSON.stringify(editor.minder.exportJson());
                             });
                             // 导图信息初始化
                             mindmapInfo = {};
@@ -89,56 +92,69 @@ angular.module('kityminderEditor')
                 }
 
                 function mapLoad(map) {
-                    var fileType = map.name.replace(/.+\./, "");
-                    switch (fileType) {
-                        case 'md':
-                            fileType = 'markdown';
-                            break;
-                        case 'km':
-                        case 'json':
-                            fileType = 'json';
-                            break;
-                        default:
-                            console.log("File not supported!");
-                            alert('only support data format(*.km, *.md, *.json)');
-                            return;
-                    }
+                    var info = RouteInfo.getInfo();
+                    if (info.pageId != "" && info.userId != "") {
+                        var fileType = map.name.replace(/.+\./, "");
+                        switch (fileType) {
+                            case 'md':
+                                fileType = 'markdown';
+                                break;
+                            case 'km':
+                            case 'json':
+                                fileType = 'json';
+                                break;
+                            default:
+                                console.log("File not supported!");
+                                alert('only support data format(*.km, *.md, *.json)');
+                                return;
+                        }
 
-                    try {
+                        try {
 
-                        var url = "http://" + RouteInfo.getIPPort() + map.pathURL;
-                        var xhr = new XMLHttpRequest();
-                        xhr.open("GET", url, true);
-                        xhr.onload = function (e) {
-                            if (xhr.status == 200) {
-                                var file = xhr.response;
+                            var url = "http://" + RouteInfo.getIPPort() + map.pathURL;
+                            var xhr = new XMLHttpRequest();
+                            xhr.open("GET", url, true);
+                            xhr.onload = function (e) {
+                                if (xhr.status == 200) {
+                                    var file = xhr.response;
 
-                                editor.minder.importData(fileType, file).then(function (data) {
-                                    $(fileInput).val('');
-                                });
+                                    editor.minder.importData(fileType, file).then(function (data) {
+                                        $(fileInput).val('');
 
-                                mindmapInfo = {
-                                    name: map.name,
-                                    resourceId: map.resourceId
+                                        // 初始化原始导图
+                                        originalMap = JSON.stringify(editor.minder.exportJson());
+                                    });
+
+                                    mindmapInfo = {
+                                        name: map.name,
+                                        resourceId: map.resourceId,
+                                        uploaderId: info.userId
+                                    }
                                 }
-                            }
-                        };
-                        xhr.send();
+                            };
+                            xhr.send();
+                        }
+                        catch (ex) {
+                            mindmapInfo = {};
+                            console.log("import mindmap error");
+                        }
                     }
-                    catch (ex) {
-                        mindmapInfo = {};
-                        console.log("import mindmap error");
+                    else if (info.pageId != "") {
+                        alert("Missing page information!");
+                    }
+                    else {
+                        alert("Missing user information, please log in!");
                     }
                 }
 
                 function deleteMap(map) {
                     try {
                         var info = RouteInfo.getInfo();
-                        if (info.pageId != "") {
+                        if (info.pageId != "" && info.userId != "") {
 
                             var folderId = info.pageId;
                             $.ajax({
-                                url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/removeFile?resourceId=' + map.resourceId + '&folderId=' + folderId,
+                                url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/removeFile?fileId=' + map.resourceId + '&folderId=' + folderId,
                                 type: "GET",
                                 async: false,
                                 success: function (data) {
@@ -153,6 +169,12 @@ angular.module('kityminderEditor')
                                     alert("Fail to delete the mindmap");
                                 }
                             });
+                        }
+                        else if (info.pageId != "") {
+                            alert("Missing page information!");
+                        }
+                        else {
+                            alert("Missing user information, please log in!");
                         }
                     }
                     catch (ex) {

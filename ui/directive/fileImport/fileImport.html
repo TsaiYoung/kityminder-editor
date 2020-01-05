@@ -28,7 +28,8 @@
                             <thead>
                                 <tr>
                                     <th style="width: 30%;">Name</th>
-                                    <th style="width: 50%;">Description</th>
+                                    <th style="width: 20%;">Editor</th>
+                                    <th style="width: 30%;">Edit time</th>
                                     <th style="width: 20%;">Operation</th>
                                 </tr>
                             </thead>
@@ -38,7 +39,8 @@
                                 <tbody>
                                     <tr ng-repeat="item in mindmapRes">
                                         <td style="width: 30%;">{{item.name}}</td>
-                                        <td style="width: 50%;">{{item.description}}</td>
+                                        <td style="width: 20%;">{{item.uploaderName}}</td>
+                                        <td style="width: 30%;">{{item.uploadTime}}</td>
                                         <td style="width: 20%;">
                                             <span style="cursor:pointer" class="glyphicon glyphicon-ok-circle"
                                                 title="Load this mindmap" ng-click="mapLoad(item)"></span>
@@ -50,8 +52,9 @@
                             </table>
                         </div>
                     </div>
-                    <div style="width: 90%; margin: auto;margin-top: 30px;">
-                        <span style="font-size: 14px;font-weight: 600; ">Open mindmap from resource center: </span>
+                    <hr/>
+                    <div style="width: 90%; margin: auto;">
+                        <span style="font-size: 14px;font-weight: 600; ">Open your own mindmap: </span>
                         <input type="file" id="fileInput" style="margin-top: 15px;"><button type="button"
                             class="btn btn-info" style="margin-top: 15px;" ng-click="mapImport()">Upload</button>
                     </div>

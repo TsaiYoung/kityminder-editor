@@ -192,7 +192,7 @@ angular.module('kityminderEditor')
 
 					'tabs': {
 						'file':'File',
-						'idea': 'Idea',
+						'idea': 'Edit',
 						'appearence': 'Appearence',
 						'view': 'View'
 					},

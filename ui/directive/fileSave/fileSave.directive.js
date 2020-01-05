@@ -13,28 +13,27 @@ angular.module('kityminderEditor')
                 scope.downloadMapFun = downloadMapFun;
 
                 function saveMapFun() {
-                    if (mindmapInfo != {} && mindmapInfo.name != undefined && mindmapInfo.resourceId != undefined
-                        && mindmapInfo.name != "" && mindmapInfo.resourceId != "") {
+                    var info = RouteInfo.getInfo();
+                    if (info.pageId != "" && info.userId != "") {
 
-                        var datatype = mindmapInfo.name.substring(mindmapInfo.name.lastIndexOf('.') + 1);
+                        if (mindmapInfo != {} && mindmapInfo.name != undefined && mindmapInfo.resourceId != undefined
+                            && mindmapInfo.name != "" && mindmapInfo.resourceId != "" && info.userId == mindmapInfo.uploaderId) {
 
-                        switch (datatype) {
-                            case 'km':
-                                exportType = 'json';
-                                break;
-                            case 'md':
-                                exportType = 'markdown';
-                                break;
-                            default:
-                                exportType = datatype;
-                                break;
-                        }
+                            var datatype = mindmapInfo.name.substring(mindmapInfo.name.lastIndexOf('.') + 1);
 
-                        editor.minder.exportData(exportType).then(function (file) {
+                            switch (datatype) {
+                                case 'km':
+                                    exportType = 'json';
+                                    break;
+                                case 'md':
+                                    exportType = 'markdown';
+                                    break;
+                                default:
+                                    exportType = datatype;
+                                    break;
+                            }
 
-                            var info = RouteInfo.getInfo();
-                            if (info.pageId != "" && info.userId != "") {
-
+                            editor.minder.exportData(exportType).then(function (file) {
                                 //thumbnail
                                 editor.minder.exportData('png').then(function (content) {
                                     //压缩
@@ -61,12 +60,16 @@ angular.module('kityminderEditor')
                                         var filename = mindmapInfo.name;
                                         var fileBlob = new File([blob], filename);
 
+                                        // 工具信息
+                                        var toolInfo = { toolName: "Mind map", toolUrl: "/GeoProblemSolving/Collaborative/Mindmap/index.html" };
+
                                         var formData = new FormData();
                                         formData.append("resourceId", mindmapInfo.resourceId);
                                         formData.append("file", fileBlob);
                                         formData.append("uploaderId", info.userId);
                                         formData.append("folderId", info.pageId);
                                         formData.append("thumbnail", thumbnailBlobFile);
+                                        formData.append("editToolInfo", JSON.stringify(toolInfo));
 
                                         try {
                                             $.ajax({
@@ -81,6 +84,8 @@ angular.module('kityminderEditor')
                                                     }
                                                     else if (data.uploaded.length > 0) {
                                                         alert("Save this mind map successfully");
+                                                        // 初始化原始导图
+                                                        originalMap = JSON.stringify(editor.minder.exportJson());
                                                     }
                                                 },
                                                 error: function (err) {
@@ -94,18 +99,17 @@ angular.module('kityminderEditor')
 
                                     }
                                 });
-
-
-                            }
-                            else {
-                                alert("Wrong url!");
-                            }
-
-                        });
-
+                            });
+                        }
+                        else {
+                            alert("Please click \"Save as (Save as a new version)\".");
+                        }
+                    }
+                    else if (info.pageId != "") {
+                        alert("Missing page information!");
                     }
                     else {
-                        alert("Please click \"Save as\".");
+                        alert("Missing user information, please log in!");
                     }
                 }
 
@@ -129,8 +133,6 @@ angular.module('kityminderEditor')
 
                             var info = RouteInfo.getInfo();
                             if (info.pageId != "" && info.userId != "") {
-
-
                                 //thumbnail
                                 editor.minder.exportData('png').then(function (content) {
                                     //压缩
@@ -157,14 +159,18 @@ angular.module('kityminderEditor')
                                         var filename = $('#mindmapName').val() + '.' + datatype;
                                         var fileBlob = new File([blob], filename);
 
+                                        // 工具信息
+                                        var toolInfo = { toolName: "Mind map", toolUrl: "/GeoProblemSolving/Collaborative/Mindmap/index.html" };
+
                                         var formData = new FormData();
                                         formData.append("file", fileBlob);
                                         formData.append("description", "Collaborative mindmap tool");
-                                        formData.append("type", "toolData");
+                                        formData.append("type", "toolData:Mindmap");
                                         formData.append("uploaderId", info.userId);
                                         formData.append("privacy", "private");
                                         formData.append("folderId", info.pageId);
                                         formData.append("thumbnail", thumbnailBlobFile);
+                                        formData.append("editToolInfo", JSON.stringify(toolInfo));
 
                                         try {
                                             $.ajax({
@@ -182,8 +188,12 @@ angular.module('kityminderEditor')
 
                                                         mindmapInfo = {
                                                             name: filename,
-                                                            resourceId: data.uploaded[0].resourceId
+                                                            resourceId: data.uploaded[0].resourceId,
+                                                            uploaderId: info.userId
                                                         };
+
+                                                        // 初始化原始导图
+                                                        originalMap = JSON.stringify(editor.minder.exportJson());
                                                     }
                                                 },
                                                 error: function (err) {
@@ -198,18 +208,16 @@ angular.module('kityminderEditor')
                                         }
                                     }
 
-
                                 });
                             }
+                            else if (info.pageId != "") {
+                                alert("Missing page information!");
+                            }
                             else {
-                                alert("Wrong url!");
-                                mindmapInfo = {};
+                                alert("Missing user information, please log in!");
                             }
 
                         });
-                    }
-                    else {
-
                     }
                 }
 
@@ -293,7 +301,7 @@ angular.module('kityminderEditor')
                         });
                     }
                     else {
-
+                        alert("Please click \"Save as (Save as a new version)\" and fill in the mindmap name, before downloading.");
                     }
                 }
 
