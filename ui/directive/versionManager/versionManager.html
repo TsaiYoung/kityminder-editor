@@ -40,7 +40,9 @@
                                         <td style="width: 20%;">
                                             <span style="cursor:pointer" class="glyphicon glyphicon-ok-circle"
                                                 title="Load this mindmap" ng-click="mapLoad(item)"></span>
-                                            <span style="cursor:pointer; margin-left: 20px;" class="glyphicon glyphicon-remove-circle"
+                                            <span style="cursor:pointer; margin-left: 5px;" class="glyphicon glyphicon-download"
+                                                title="Download this mindmap" ng-click="mapDownload(item)"></span>
+                                            <span style="cursor:pointer; margin-left: 5px;" class="glyphicon glyphicon-remove-circle"
                                                 title="Delete this mindmap" ng-click="deleteMap(item)"></span>
                                         </td>
                                     </tr>
@@ -50,8 +52,6 @@
                     </div>
                 </div>
                 <div class="modal-footer" style="padding:5px 15px">
-                    <!-- <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="saveMap(item)">Save
-                    </button> -->
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close
                     </button>
                 </div>

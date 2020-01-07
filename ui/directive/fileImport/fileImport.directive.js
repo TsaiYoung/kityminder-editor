@@ -12,7 +12,6 @@ angular.module('kityminderEditor')
                 scope.updateMaplist = updateMaplist;
                 scope.mapImport = mapImport;
                 scope.mapLoad = mapLoad;
-                scope.mapDownload = mapDownload;
                 scope.deleteMap = deleteMap;
 
                 function updateMaplist() {
@@ -148,15 +147,6 @@ angular.module('kityminderEditor')
                     }
                 }
 
-                function mapDownload(map) {
-                    var a = document.createElement("a");
-                    a.href = 'http://' + RouteInfo.getIPPort() + map.pathURL;
-                    $("body").append(a);
-                    a.click();
-                    $(a).remove();
-                }
-
-
                 function deleteMap(map) {
                     try {
                         var info = RouteInfo.getInfo();
@@ -191,19 +181,6 @@ angular.module('kityminderEditor')
                         console.log("fail")
                     }
                 }
-
-                function getBlobBydataURI(dataurl) {
-                    var arr = dataurl.split(","),
-                        mime = arr[0].match(/:(.*?);/)[1],
-                        bstr = atob(arr[1]),
-                        n = bstr.length,
-                        u8arr = new Uint8Array(n);
-                    while (n--) {
-                        u8arr[n] = bstr.charCodeAt(n);
-                    }
-                    return new Blob([u8arr], { type: mime });
-                }
             }
-            
         }
     }]);
