@@ -1,9 +1,4 @@
 <tabset>
-    <tab heading="{{ 'file' | lang: 'ui/tabs'; }}" ng-click="toggleTopTab('file')" select="setCurTab('file')">        
-        <file-import minder="minder"></file-import>
-        <file-save minder="minder"></file-save>
-        <version-manager minder="minder"></version-manager>
-    </tab>
     <tab heading="{{ 'idea' | lang: 'ui/tabs'; }}" ng-click="toggleTopTab('idea')" select="setCurTab('idea')">
         <undo-redo editor="editor"></undo-redo>
         <append-node minder="minder"></append-node>
@@ -28,5 +23,9 @@
         <expand-level minder="minder"></expand-level>
         <select-all minder="minder"></select-all>
         <search-btn minder="minder"></search-btn>
+    </tab>
+    <tab heading="{{ 'file' | lang: 'ui/tabs'; }}" ng-click="toggleTopTab('file')" select="setCurTab('file')">        
+        <file-import minder="minder"></file-import>
+        <file-save minder="minder"></file-save>
     </tab>
 </tabset>

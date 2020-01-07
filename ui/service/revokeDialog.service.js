@@ -5,7 +5,7 @@ angular.module('kityminderEditor').service('revokeDialog', ['$modal', 'minder.se
         // 触发导入节点或导出节点对话框
         var minder = window.minder;
         var editor = window.editor;
-        var parentFSM = editor.hotbox.getParentFSM();
+        // var parentFSM = editor.hotbox.getParentFSM();
 
 
         minder.on('importNodeData', function() {

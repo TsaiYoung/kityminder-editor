@@ -57,19 +57,8 @@ _p[0] = {
         }
         KMEditor.assemble = assemble;
         assemble(_p.r(7));
-        assemble(_p.r(9));
-        assemble(_p.r(14));
-        assemble(_p.r(18));
-        assemble(_p.r(11));
-        assemble(_p.r(12));
-        assemble(_p.r(5));
-        assemble(_p.r(6));
         assemble(_p.r(8));
-        assemble(_p.r(15));
-        assemble(_p.r(10));
-        assemble(_p.r(13));
-        assemble(_p.r(16));
-        assemble(_p.r(17));
+        assemble(_p.r(9));
         return module.exports = KMEditor;
     }
 };
@@ -432,141 +421,6 @@ _p[7] = {
     }
 };
 
-//src/runtime/drag.js
-/**
- * @fileOverview
- *
- * 用于拖拽节点时屏蔽键盘事件
- *
- * @author: techird
- * @copyright: Baidu FEX, 2014
- */
-_p[8] = {
-    value: function(require, exports, module) {
-        var Hotbox = _p.r(2);
-        var Debug = _p.r(19);
-        var debug = new Debug("drag");
-        function DragRuntime() {
-            var fsm = this.fsm;
-            var minder = this.minder;
-            var hotbox = this.hotbox;
-            var receiver = this.receiver;
-            var receiverElement = receiver.element;
-            // setup everything to go
-            setupFsm();
-            // listen the fsm changes, make action.
-            function setupFsm() {
-                // when jumped to drag mode, enter
-                fsm.when("* -> drag", function() {});
-                fsm.when("drag -> *", function(exit, enter, reason) {
-                    if (reason == "drag-finish") {}
-                });
-            }
-            var downX, downY;
-            var MOUSE_HAS_DOWN = 0;
-            var MOUSE_HAS_UP = 1;
-            var BOUND_CHECK = 20;
-            var flag = MOUSE_HAS_UP;
-            var maxX, maxY, osx, osy, containerY;
-            var freeHorizen = false, freeVirtical = false;
-            var frame;
-            function move(direction, speed) {
-                if (!direction) {
-                    freeHorizen = freeVirtical = false;
-                    frame && kity.releaseFrame(frame);
-                    frame = null;
-                    return;
-                }
-                if (!frame) {
-                    frame = kity.requestFrame(function(direction, speed, minder) {
-                        return function(frame) {
-                            switch (direction) {
-                              case "left":
-                                minder._viewDragger.move({
-                                    x: -speed,
-                                    y: 0
-                                }, 0);
-                                break;
-
-                              case "top":
-                                minder._viewDragger.move({
-                                    x: 0,
-                                    y: -speed
-                                }, 0);
-                                break;
-
-                              case "right":
-                                minder._viewDragger.move({
-                                    x: speed,
-                                    y: 0
-                                }, 0);
-                                break;
-
-                              case "bottom":
-                                minder._viewDragger.move({
-                                    x: 0,
-                                    y: speed
-                                }, 0);
-                                break;
-
-                              default:
-                                return;
-                            }
-                            frame.next();
-                        };
-                    }(direction, speed, minder));
-                }
-            }
-            minder.on("mousedown", function(e) {
-                flag = MOUSE_HAS_DOWN;
-                var rect = minder.getPaper().container.getBoundingClientRect();
-                downX = e.originEvent.clientX;
-                downY = e.originEvent.clientY;
-                containerY = rect.top;
-                maxX = rect.width;
-                maxY = rect.height;
-            });
-            minder.on("mousemove", function(e) {
-                if (fsm.state() === "drag" && flag == MOUSE_HAS_DOWN && minder.getSelectedNode() && (Math.abs(downX - e.originEvent.clientX) > BOUND_CHECK || Math.abs(downY - e.originEvent.clientY) > BOUND_CHECK)) {
-                    osx = e.originEvent.clientX;
-                    osy = e.originEvent.clientY - containerY;
-                    if (osx < BOUND_CHECK) {
-                        move("right", BOUND_CHECK - osx);
-                    } else if (osx > maxX - BOUND_CHECK) {
-                        move("left", BOUND_CHECK + osx - maxX);
-                    } else {
-                        freeHorizen = true;
-                    }
-                    if (osy < BOUND_CHECK) {
-                        move("bottom", osy);
-                    } else if (osy > maxY - BOUND_CHECK) {
-                        move("top", BOUND_CHECK + osy - maxY);
-                    } else {
-                        freeVirtical = true;
-                    }
-                    if (freeHorizen && freeVirtical) {
-                        move(false);
-                    }
-                }
-                if (fsm.state() !== "drag" && flag === MOUSE_HAS_DOWN && minder.getSelectedNode() && (Math.abs(downX - e.originEvent.clientX) > BOUND_CHECK || Math.abs(downY - e.originEvent.clientY) > BOUND_CHECK)) {
-                    if (fsm.state() === "hotbox") {
-                        hotbox.active(Hotbox.STATE_IDLE);
-                    }
-                    return fsm.jump("drag", "user-drag");
-                }
-            });
-            window.addEventListener("mouseup", function() {
-                flag = MOUSE_HAS_UP;
-                if (fsm.state() === "drag") {
-                    move(false);
-                    return fsm.jump("normal", "drag-finish");
-                }
-            }, false);
-        }
-        return module.exports = DragRuntime;
-    }
-};
-
 //src/runtime/fsm.js
 /**
  * @fileOverview
@@ -576,9 +430,9 @@ _p[8] = {
  * @author: techird
  * @copyright: Baidu FEX, 2014
  */
-_p[9] = {
+_p[8] = {
     value: function(require, exports, module) {
-        var Debug = _p.r(19);
+        var Debug = _p.r(10);
         var debug = new Debug("fsm");
         function handlerConditionMatch(condition, when, exit, enter) {
             if (condition.when != when) return false;
@@ -675,714 +529,6 @@ _p[9] = {
     }
 };
 
-//src/runtime/history.js
-/**
- * @fileOverview
- *
- * 历史管理
- *
- * @author: techird
- * @copyright: Baidu FEX, 2014
- */
-_p[10] = {
-    value: function(require, exports, module) {
-        var jsonDiff = _p.r(22);
-        function HistoryRuntime() {
-            var minder = this.minder;
-            var hotbox = this.hotbox;
-            var MAX_HISTORY = 100;
-            var lastSnap;
-            var patchLock;
-            var undoDiffs;
-            var redoDiffs;
-            function reset() {
-                undoDiffs = [];
-                redoDiffs = [];
-                lastSnap = minder.exportJson();
-            }
-            function makeUndoDiff() {
-                var headSnap = minder.exportJson();
-                var diff = jsonDiff(headSnap, lastSnap);
-                if (diff.length) {
-                    undoDiffs.push(diff);
-                    while (undoDiffs.length > MAX_HISTORY) {
-                        undoDiffs.shift();
-                    }
-                    lastSnap = headSnap;
-                    return true;
-                }
-            }
-            function makeRedoDiff() {
-                var revertSnap = minder.exportJson();
-                redoDiffs.push(jsonDiff(revertSnap, lastSnap));
-                lastSnap = revertSnap;
-            }
-            function undo() {
-                patchLock = true;
-                var undoDiff = undoDiffs.pop();
-                if (undoDiff) {
-                    minder.applyPatches(undoDiff);
-                    makeRedoDiff();
-                }
-                patchLock = false;
-            }
-            function redo() {
-                patchLock = true;
-                var redoDiff = redoDiffs.pop();
-                if (redoDiff) {
-                    minder.applyPatches(redoDiff);
-                    makeUndoDiff();
-                }
-                patchLock = false;
-            }
-            function changed() {
-                if (patchLock) return;
-                if (makeUndoDiff()) redoDiffs = [];
-            }
-            function hasUndo() {
-                return !!undoDiffs.length;
-            }
-            function hasRedo() {
-                return !!redoDiffs.length;
-            }
-            function updateSelection(e) {
-                if (!patchLock) return;
-                var patch = e.patch;
-                switch (patch.express) {
-                  case "node.add":
-                    minder.select(patch.node.getChild(patch.index), true);
-                    break;
-
-                  case "node.remove":
-                  case "data.replace":
-                  case "data.remove":
-                  case "data.add":
-                    minder.select(patch.node, true);
-                    break;
-                }
-            }
-            this.history = {
-                reset: reset,
-                undo: undo,
-                redo: redo,
-                hasUndo: hasUndo,
-                hasRedo: hasRedo
-            };
-            reset();
-            minder.on("contentchange", changed);
-            minder.on("import", reset);
-            minder.on("patch", updateSelection);
-            var main = hotbox.state("main");
-            main.button({
-                position: "top",
-                label: "Undo",
-                key: "Ctrl + Z",
-                enable: hasUndo,
-                action: undo,
-                next: "idle"
-            });
-            main.button({
-                position: "top",
-                label: "Redo",
-                key: "Ctrl + Y",
-                enable: hasRedo,
-                action: redo,
-                next: "idle"
-            });
-        }
-        window.diff = jsonDiff;
-        return module.exports = HistoryRuntime;
-    }
-};
-
-//src/runtime/hotbox.js
-/**
- * @fileOverview
- *
- * 热盒 Runtime
- *
- * @author: techird
- * @copyright: Baidu FEX, 2014
- */
-_p[11] = {
-    value: function(require, exports, module) {
-        var Hotbox = _p.r(2);
-        function HotboxRuntime() {
-            var fsm = this.fsm;
-            var minder = this.minder;
-            var receiver = this.receiver;
-            var container = this.container;
-            var hotbox = new Hotbox(container);
-            hotbox.setParentFSM(fsm);
-            fsm.when("normal -> hotbox", function(exit, enter, reason) {
-                var node = minder.getSelectedNode();
-                var position;
-                if (node) {
-                    var box = node.getRenderBox();
-                    position = {
-                        x: box.cx,
-                        y: box.cy
-                    };
-                }
-                hotbox.active("main", position);
-            });
-            fsm.when("normal -> normal", function(exit, enter, reason, e) {
-                if (reason == "shortcut-handle") {
-                    var handleResult = hotbox.dispatch(e);
-                    if (handleResult) {
-                        e.preventDefault();
-                    } else {
-                        minder.dispatchKeyEvent(e);
-                    }
-                }
-            });
-            fsm.when("modal -> normal", function(exit, enter, reason, e) {
-                if (reason == "import-text-finish") {
-                    receiver.element.focus();
-                }
-            });
-            this.hotbox = hotbox;
-        }
-        return module.exports = HotboxRuntime;
-    }
-};
-
-//src/runtime/input.js
-/**
- * @fileOverview
- *
- * 文本输入支持
- *
- * @author: techird
- * @copyright: Baidu FEX, 2014
- */
-_p[12] = {
-    value: function(require, exports, module) {
-        _p.r(21);
-        var Debug = _p.r(19);
-        var debug = new Debug("input");
-        function InputRuntime() {
-            var fsm = this.fsm;
-            var minder = this.minder;
-            var hotbox = this.hotbox;
-            var receiver = this.receiver;
-            var receiverElement = receiver.element;
-            var isGecko = window.kity.Browser.gecko;
-            // setup everything to go
-            setupReciverElement();
-            setupFsm();
-            setupHotbox();
-            // expose editText()
-            this.editText = editText;
-            // listen the fsm changes, make action.
-            function setupFsm() {
-                // when jumped to input mode, enter
-                fsm.when("* -> input", enterInputMode);
-                // when exited, commit or exit depends on the exit reason
-                fsm.when("input -> *", function(exit, enter, reason) {
-                    switch (reason) {
-                      case "input-cancel":
-                        return exitInputMode();
-
-                      case "input-commit":
-                      default:
-                        return commitInputResult();
-                    }
-                });
-                // lost focus to commit
-                receiver.onblur(function(e) {
-                    if (fsm.state() == "input") {
-                        fsm.jump("normal", "input-commit");
-                    }
-                });
-                minder.on("beforemousedown", function() {
-                    if (fsm.state() == "input") {
-                        fsm.jump("normal", "input-commit");
-                    }
-                });
-                minder.on("dblclick", function() {
-                    if (minder.getSelectedNode() && minder._status !== "readonly") {
-                        editText();
-                    }
-                });
-            }
-            // let the receiver follow the current selected node position
-            function setupReciverElement() {
-                if (debug.flaged) {
-                    receiverElement.classList.add("debug");
-                }
-                receiverElement.onmousedown = function(e) {
-                    e.stopPropagation();
-                };
-                minder.on("layoutallfinish viewchange viewchanged selectionchange", function(e) {
-                    // viewchange event is too frequenced, lazy it
-                    if (e.type == "viewchange" && fsm.state() != "input") return;
-                    updatePosition();
-                });
-                updatePosition();
-            }
-            // edit entrance in hotbox
-            function setupHotbox() {
-                hotbox.state("main").button({
-                    position: "center",
-                    label: "Edit",
-                    key: "F2",
-                    enable: function() {
-                        return minder.queryCommandState("text") != -1;
-                    },
-                    action: editText
-                });
-            }
-            /**
-         * 增加对字体的鉴别，以保证用户在编辑状态ctrl/cmd + b/i所触发的加粗斜体与显示一致
-         * @editor Naixor
-         * @Date 2015-12-2
-         */
-            // edit for the selected node
-            function editText() {
-                var node = minder.getSelectedNode();
-                if (!node) {
-                    return;
-                }
-                var textContainer = receiverElement;
-                receiverElement.innerText = "";
-                if (node.getData("font-weight") === "bold") {
-                    var b = document.createElement("b");
-                    textContainer.appendChild(b);
-                    textContainer = b;
-                }
-                if (node.getData("font-style") === "italic") {
-                    var i = document.createElement("i");
-                    textContainer.appendChild(i);
-                    textContainer = i;
-                }
-                textContainer.innerText = minder.queryCommandValue("text");
-                if (isGecko) {
-                    receiver.fixFFCaretDisappeared();
-                }
-                fsm.jump("input", "input-request");
-                receiver.selectAll();
-            }
-            /**
-         * 增加对字体的鉴别，以保证用户在编辑状态ctrl/cmd + b/i所触发的加粗斜体与显示一致
-         * @editor Naixor
-         * @Date 2015-12-2
-         */
-            function enterInputMode() {
-                var node = minder.getSelectedNode();
-                if (node) {
-                    var fontSize = node.getData("font-size") || node.getStyle("font-size");
-                    receiverElement.style.fontSize = fontSize + "px";
-                    receiverElement.style.minWidth = 0;
-                    receiverElement.style.minWidth = receiverElement.clientWidth + "px";
-                    receiverElement.style.fontWeight = node.getData("font-weight") || "";
-                    receiverElement.style.fontStyle = node.getData("font-style") || "";
-                    receiverElement.classList.add("input");
-                    receiverElement.focus();
-                }
-            }
-            /**
-         * 按照文本提交操作处理
-         * @Desc: 从其他节点复制文字到另一个节点时部分浏览器(chrome)会自动包裹一个span标签，这样试用一下逻辑出来的就不是text节点二是span节点因此导致undefined的情况发生
-         * @Warning: 下方代码使用[].slice.call来将HTMLDomCollection处理成为Array，ie8及以下会有问题
-         * @Editor: Naixor
-         * @Date: 2015.9.16
-         */
-            function commitInputText(textNodes) {
-                var text = "";
-                var TAB_CHAR = "\t", ENTER_CHAR = "\n", STR_CHECK = /\S/, SPACE_CHAR = " ", // 针对FF,SG,BD,LB,IE等浏览器下SPACE的charCode存在为32和160的情况做处理
-                SPACE_CHAR_REGEXP = new RegExp("( |" + String.fromCharCode(160) + ")"), BR = document.createElement("br");
-                var isBold = false, isItalic = false;
-                for (var str, _divChildNodes, space_l, space_num, tab_num, i = 0, l = textNodes.length; i < l; i++) {
-                    str = textNodes[i];
-                    switch (Object.prototype.toString.call(str)) {
-                      // 正常情况处理
-                        case "[object HTMLBRElement]":
-                        {
-                            text += ENTER_CHAR;
-                            break;
-                        }
-
-                      case "[object Text]":
-                        {
-                            // SG下会莫名其妙的加上&nbsp;影响后续判断，干掉！
-                            /**
-                         * FF下的wholeText会导致如下问题：
-                         *     |123| -> 在一个节点中输入一段字符，此时TextNode为[#Text 123]
-                         *     提交并重新编辑，在后面追加几个字符
-                         *     |123abc| -> 此时123为一个TextNode为[#Text 123, #Text abc]，但是对这两个任意取值wholeText均为全部内容123abc
-                         * 上述BUG仅存在在FF中，故将wholeText更改为textContent
-                         */
-                            str = str.textContent.replace("&nbsp;", " ");
-                            if (!STR_CHECK.test(str)) {
-                                space_l = str.length;
-                                while (space_l--) {
-                                    if (SPACE_CHAR_REGEXP.test(str[space_l])) {
-                                        text += SPACE_CHAR;
-                                    } else if (str[space_l] === TAB_CHAR) {
-                                        text += TAB_CHAR;
-                                    }
-                                }
-                            } else {
-                                text += str;
-                            }
-                            break;
-                        }
-
-                      // ctrl + b/i 会给字体加上<b>/<i>标签来实现黑体和斜体
-                        case "[object HTMLElement]":
-                        {
-                            switch (str.nodeName) {
-                              case "B":
-                                {
-                                    isBold = true;
-                                    break;
-                                }
-
-                              case "I":
-                                {
-                                    isItalic = true;
-                                    break;
-                                }
-
-                              default:
-                                {}
-                            }
-                            [].splice.apply(textNodes, [ i, 1 ].concat([].slice.call(str.childNodes)));
-                            l = textNodes.length;
-                            i--;
-                            break;
-                        }
-
-                      // 被增加span标签的情况会被处理成正常情况并会推交给上面处理
-                        case "[object HTMLSpanElement]":
-                        {
-                            [].splice.apply(textNodes, [ i, 1 ].concat([].slice.call(str.childNodes)));
-                            l = textNodes.length;
-                            i--;
-                            break;
-                        }
-
-                      // 若标签为image标签，则判断是否为合法url，是将其加载进来
-                        case "[object HTMLImageElement]":
-                        {
-                            if (str.src) {
-                                if (/http(|s):\/\//.test(str.src)) {
-                                    minder.execCommand("Image", str.src, str.alt);
-                                } else {}
-                            }
-                            break;
-                        }
-
-                      // 被增加div标签的情况会被处理成正常情况并会推交给上面处理
-                        case "[object HTMLDivElement]":
-                        {
-                            _divChildNodes = [];
-                            for (var di = 0, l = str.childNodes.length; di < l; di++) {
-                                _divChildNodes.push(str.childNodes[di]);
-                            }
-                            _divChildNodes.push(BR);
-                            [].splice.apply(textNodes, [ i, 1 ].concat(_divChildNodes));
-                            l = textNodes.length;
-                            i--;
-                            break;
-                        }
-
-                      default:
-                        {
-                            if (str && str.childNodes.length) {
-                                _divChildNodes = [];
-                                for (var di = 0, l = str.childNodes.length; di < l; di++) {
-                                    _divChildNodes.push(str.childNodes[di]);
-                                }
-                                _divChildNodes.push(BR);
-                                [].splice.apply(textNodes, [ i, 1 ].concat(_divChildNodes));
-                                l = textNodes.length;
-                                i--;
-                            } else {
-                                if (str && str.textContent !== undefined) {
-                                    text += str.textContent;
-                                } else {
-                                    text += "";
-                                }
-                            }
-                        }
-                    }
-                }
-                text = text.replace(/^\n*|\n*$/g, "");
-                text = text.replace(new RegExp("(\n|\r|\n\r)( |" + String.fromCharCode(160) + "){4}", "g"), "$1\t");
-                minder.getSelectedNode().setText(text);
-                if (isBold) {
-                    minder.queryCommandState("bold") || minder.execCommand("bold");
-                } else {
-                    minder.queryCommandState("bold") && minder.execCommand("bold");
-                }
-                if (isItalic) {
-                    minder.queryCommandState("italic") || minder.execCommand("italic");
-                } else {
-                    minder.queryCommandState("italic") && minder.execCommand("italic");
-                }
-                exitInputMode();
-                return text;
-            }
-            /**
-         * 判断节点的文本信息是否是
-         * @Desc: 从其他节点复制文字到另一个节点时部分浏览器(chrome)会自动包裹一个span标签，这样使用以下逻辑出来的就不是text节点二是span节点因此导致undefined的情况发生
-         * @Notice: 此处逻辑应该拆分到 kityminder-core/core/data中去，单独增加一个对某个节点importJson的事件
-         * @Editor: Naixor
-         * @Date: 2015.9.16
-         */
-            function commitInputNode(node, text) {
-                try {
-                    minder.decodeData("text", text).then(function(json) {
-                        function importText(node, json, minder) {
-                            var data = json.data;
-                            node.setText(data.text || "");
-                            var childrenTreeData = json.children || [];
-                            for (var i = 0; i < childrenTreeData.length; i++) {
-                                var childNode = minder.createNode(null, node);
-                                importText(childNode, childrenTreeData[i], minder);
-                            }
-                            return node;
-                        }
-                        importText(node, json, minder);
-                        minder.fire("contentchange");
-                        minder.getRoot().renderTree();
-                        minder.layout(300);
-                    });
-                } catch (e) {
-                    minder.fire("contentchange");
-                    minder.getRoot().renderTree();
-                    // 无法被转换成脑图节点则不处理
-                    if (e.toString() !== "Error: Invalid local format") {
-                        throw e;
-                    }
-                }
-            }
-            function commitInputResult() {
-                /**
-             * @Desc: 进行如下处理：
-             *             根据用户的输入判断是否生成新的节点
-             *        fix #83 https://github.com/fex-team/kityminder-editor/issues/83
-             * @Editor: Naixor
-             * @Date: 2015.9.16
-             */
-                var textNodes = [].slice.call(receiverElement.childNodes);
-                /**
-             * @Desc: 增加setTimeout的原因：ie下receiverElement.innerHTML=""会导致后
-             * 		  面commitInputText中使用textContent报错，不要问我什么原因！
-             * @Editor: Naixor
-             * @Date: 2015.12.14
-             */
-                setTimeout(function() {
-                    // 解决过大内容导致SVG窜位问题
-                    receiverElement.innerHTML = "";
-                }, 0);
-                var node = minder.getSelectedNode();
-                textNodes = commitInputText(textNodes);
-                commitInputNode(node, textNodes);
-                if (node.type == "root") {
-                    var rootText = minder.getRoot().getText();
-                    minder.fire("initChangeRoot", {
-                        text: rootText
-                    });
-                }
-            }
-            function exitInputMode() {
-                receiverElement.classList.remove("input");
-                receiver.selectAll();
-            }
-            function updatePosition() {
-                var planed = updatePosition;
-                var focusNode = minder.getSelectedNode();
-                if (!focusNode) return;
-                if (!planed.timer) {
-                    planed.timer = setTimeout(function() {
-                        var box = focusNode.getRenderBox("TextRenderer");
-                        receiverElement.style.left = Math.round(box.x) + "px";
-                        receiverElement.style.top = (debug.flaged ? Math.round(box.bottom + 30) : Math.round(box.y)) + "px";
-                        //receiverElement.focus();
-                        planed.timer = 0;
-                    });
-                }
-            }
-        }
-        return module.exports = InputRuntime;
-    }
-};
-
-//src/runtime/jumping.js
-/**
- * @fileOverview
- *
- * 根据按键控制状态机的跳转
- *
- * @author: techird
- * @copyright: Baidu FEX, 2014
- */
-_p[13] = {
-    value: function(require, exports, module) {
-        var Hotbox = _p.r(2);
-        // Nice: http://unixpapa.com/js/key.html
-        function isIntendToInput(e) {
-            if (e.ctrlKey || e.metaKey || e.altKey) return false;
-            // a-zA-Z
-            if (e.keyCode >= 65 && e.keyCode <= 90) return true;
-            // 0-9 以及其上面的符号
-            if (e.keyCode >= 48 && e.keyCode <= 57) return true;
-            // 小键盘区域 (除回车外)
-            if (e.keyCode != 108 && e.keyCode >= 96 && e.keyCode <= 111) return true;
-            // 小键盘区域 (除回车外)
-            // @yinheli from pull request
-            if (e.keyCode != 108 && e.keyCode >= 96 && e.keyCode <= 111) return true;
-            // 输入法
-            if (e.keyCode == 229 || e.keyCode === 0) return true;
-            return false;
-        }
-        /**
-     * @Desc: 下方使用receiver.enable()和receiver.disable()通过
-     *        修改div contenteditable属性的hack来解决开启热核后依然无法屏蔽浏览器输入的bug;
-     *        特别: win下FF对于此种情况必须要先blur在focus才能解决，但是由于这样做会导致用户
-     *             输入法状态丢失，因此对FF暂不做处理
-     * @Editor: Naixor
-     * @Date: 2015.09.14
-     */
-        function JumpingRuntime() {
-            var fsm = this.fsm;
-            var minder = this.minder;
-            var receiver = this.receiver;
-            var container = this.container;
-            var receiverElement = receiver.element;
-            var hotbox = this.hotbox;
-            var compositionLock = false;
-            // normal -> *
-            receiver.listen("normal", function(e) {
-                // 为了防止处理进入edit模式而丢失处理的首字母,此时receiver必须为enable
-                receiver.enable();
-                // normal -> hotbox
-                if (e.is("Space")) {
-                    e.preventDefault();
-                    // safari下Space触发hotbox,然而这时Space已在receiver上留下作案痕迹,因此抹掉
-                    if (kity.Browser.safari) {
-                        receiverElement.innerHTML = "";
-                    }
-                    return fsm.jump("hotbox", "space-trigger");
-                }
-                /**
-             * check
-             * @editor Naixor
-             * @Date 2015-12-2
-             */
-                switch (e.type) {
-                  case "keydown":
-                    {
-                        if (minder.getSelectedNode()) {
-                            if (isIntendToInput(e)) {
-                                return fsm.jump("input", "user-input");
-                            }
-                        } else {
-                            receiverElement.innerHTML = "";
-                        }
-                        // normal -> normal shortcut
-                        fsm.jump("normal", "shortcut-handle", e);
-                        break;
-                    }
-
-                  case "keyup":
-                    {
-                        break;
-                    }
-
-                  default:
-                    {}
-                }
-            });
-            // hotbox -> normal
-            receiver.listen("hotbox", function(e) {
-                receiver.disable();
-                e.preventDefault();
-                var handleResult = hotbox.dispatch(e);
-                if (hotbox.state() == Hotbox.STATE_IDLE && fsm.state() == "hotbox") {
-                    return fsm.jump("normal", "hotbox-idle");
-                }
-            });
-            // input => normal
-            receiver.listen("input", function(e) {
-                receiver.enable();
-                if (e.type == "keydown") {
-                    if (e.is("Enter")) {
-                        e.preventDefault();
-                        return fsm.jump("normal", "input-commit");
-                    }
-                    if (e.is("Esc")) {
-                        e.preventDefault();
-                        return fsm.jump("normal", "input-cancel");
-                    }
-                    if (e.is("Tab") || e.is("Shift + Tab")) {
-                        e.preventDefault();
-                    }
-                } else if (e.type == "keyup" && e.is("Esc")) {
-                    e.preventDefault();
-                    if (!compositionLock) {
-                        return fsm.jump("normal", "input-cancel");
-                    }
-                } else if (e.type == "compositionstart") {
-                    compositionLock = true;
-                } else if (e.type == "compositionend") {
-                    setTimeout(function() {
-                        compositionLock = false;
-                    });
-                }
-            });
-            //////////////////////////////////////////////
-            /// 右键呼出热盒
-            /// 判断的标准是：按下的位置和结束的位置一致
-            //////////////////////////////////////////////
-            var downX, downY;
-            var MOUSE_RB = 2;
-            // 右键
-            container.addEventListener("mousedown", function(e) {
-                if (e.button == MOUSE_RB) {
-                    e.preventDefault();
-                }
-                if (fsm.state() == "hotbox") {
-                    hotbox.active(Hotbox.STATE_IDLE);
-                    fsm.jump("normal", "blur");
-                } else if (fsm.state() == "normal" && e.button == MOUSE_RB) {
-                    downX = e.clientX;
-                    downY = e.clientY;
-                }
-            }, false);
-            container.addEventListener("mousewheel", function(e) {
-                if (fsm.state() == "hotbox") {
-                    hotbox.active(Hotbox.STATE_IDLE);
-                    fsm.jump("normal", "mousemove-blur");
-                }
-            }, false);
-            container.addEventListener("contextmenu", function(e) {
-                e.preventDefault();
-            });
-            container.addEventListener("mouseup", function(e) {
-                if (fsm.state() != "normal") {
-                    return;
-                }
-                if (e.button != MOUSE_RB || e.clientX != downX || e.clientY != downY) {
-                    return;
-                }
-                if (!minder.getSelectedNode()) {
-                    return;
-                }
-                fsm.jump("hotbox", "content-menu");
-            }, false);
-            // 阻止热盒事件冒泡，在热盒正确执行前导致热盒关闭
-            hotbox.$element.addEventListener("mousedown", function(e) {
-                e.stopPropagation();
-            });
-        }
-        return module.exports = JumpingRuntime;
-    }
-};
-
 //src/runtime/minder.js
 /**
  * @fileOverview
@@ -1392,7 +538,7 @@ _p[13] = {
  * @author: techird
  * @copyright: Baidu FEX, 2014
  */
-_p[14] = {
+_p[9] = {
     value: function(require, exports, module) {
         var Minder = _p.r(4);
         function MinderRuntime() {
@@ -1413,310 +559,6 @@ _p[14] = {
     }
 };
 
-//src/runtime/node.js
-_p[15] = {
-    value: function(require, exports, module) {
-        function NodeRuntime() {
-            var runtime = this;
-            var minder = this.minder;
-            var hotbox = this.hotbox;
-            var fsm = this.fsm;
-            var main = hotbox.state("main");
-            var buttons = [ "Up:Alt+Up:ArrangeUp", "Child:Tab|Insert:AppendChildNode", "Sibling:Enter:AppendSiblingNode", "Down:Alt+Down:ArrangeDown", "Remove:Delete|Backspace:RemoveNode", "Parent:Shift+Tab|Shift+Insert:AppendParentNode" ];
-            var AppendLock = 0;
-            buttons.forEach(function(button) {
-                var parts = button.split(":");
-                var label = parts.shift();
-                var key = parts.shift();
-                var command = parts.shift();
-                main.button({
-                    position: "ring",
-                    label: label,
-                    key: key,
-                    action: function() {
-                        if (command.indexOf("Append") === 0) {
-                            AppendLock++;
-                            minder.execCommand(command, "Branch topic");
-                            // provide in input runtime
-                            function afterAppend() {
-                                if (!--AppendLock) {
-                                    runtime.editText();
-                                }
-                                minder.off("layoutallfinish", afterAppend);
-                            }
-                            minder.on("layoutallfinish", afterAppend);
-                        } else {
-                            minder.execCommand(command);
-                            fsm.jump("normal", "command-executed");
-                        }
-                    },
-                    enable: function() {
-                        return minder.queryCommandState(command) != -1;
-                    }
-                });
-            });
-            main.button({
-                position: "bottom",
-                label: "Import node",
-                key: "Alt + V",
-                enable: function() {
-                    var selectedNodes = minder.getSelectedNodes();
-                    return selectedNodes.length == 1;
-                },
-                action: importNodeData,
-                next: "idle"
-            });
-            main.button({
-                position: "bottom",
-                label: "Export node",
-                key: "Alt + C",
-                enable: function() {
-                    var selectedNodes = minder.getSelectedNodes();
-                    return selectedNodes.length == 1;
-                },
-                action: exportNodeData,
-                next: "idle"
-            });
-            function importNodeData() {
-                minder.fire("importNodeData");
-            }
-            function exportNodeData() {
-                minder.fire("exportNodeData");
-            }
-        }
-        return module.exports = NodeRuntime;
-    }
-};
-
-//src/runtime/priority.js
-_p[16] = {
-    value: function(require, exports, module) {
-        function PriorityRuntime() {
-            var minder = this.minder;
-            var hotbox = this.hotbox;
-            var main = hotbox.state("main");
-            main.button({
-                position: "top",
-                label: "Priority",
-                key: "P",
-                next: "priority",
-                enable: function() {
-                    return minder.queryCommandState("priority") != -1;
-                }
-            });
-            var priority = hotbox.state("priority");
-            "123456789".replace(/./g, function(p) {
-                priority.button({
-                    position: "ring",
-                    label: "P" + p,
-                    key: p,
-                    action: function() {
-                        minder.execCommand("Priority", p);
-                    }
-                });
-            });
-            priority.button({
-                position: "center",
-                label: "移除",
-                key: "Del",
-                action: function() {
-                    minder.execCommand("Priority", 0);
-                }
-            });
-            priority.button({
-                position: "top",
-                label: "返回",
-                key: "esc",
-                next: "back"
-            });
-        }
-        return module.exports = PriorityRuntime;
-    }
-};
-
-//src/runtime/progress.js
-_p[17] = {
-    value: function(require, exports, module) {
-        function ProgressRuntime() {
-            var minder = this.minder;
-            var hotbox = this.hotbox;
-            var main = hotbox.state("main");
-            main.button({
-                position: "top",
-                label: "Progress",
-                key: "G",
-                next: "progress",
-                enable: function() {
-                    return minder.queryCommandState("progress") != -1;
-                }
-            });
-            var progress = hotbox.state("progress");
-            "012345678".replace(/./g, function(p) {
-                progress.button({
-                    position: "ring",
-                    label: "G" + p,
-                    key: p,
-                    action: function() {
-                        minder.execCommand("Progress", parseInt(p) + 1);
-                    }
-                });
-            });
-            progress.button({
-                position: "center",
-                label: "移除",
-                key: "Del",
-                action: function() {
-                    minder.execCommand("Progress", 0);
-                }
-            });
-            progress.button({
-                position: "top",
-                label: "返回",
-                key: "esc",
-                next: "back"
-            });
-        }
-        return module.exports = ProgressRuntime;
-    }
-};
-
-//src/runtime/receiver.js
-/**
- * @fileOverview
- *
- * 键盘事件接收/分发器
- *
- * @author: techird
- * @copyright: Baidu FEX, 2014
- */
-_p[18] = {
-    value: function(require, exports, module) {
-        var key = _p.r(23);
-        var hotbox = _p.r(2);
-        function ReceiverRuntime() {
-            var fsm = this.fsm;
-            var minder = this.minder;
-            var me = this;
-            // 接收事件的 div
-            var element = document.createElement("div");
-            element.contentEditable = true;
-            /**
-         * @Desc: 增加tabindex属性使得element的contenteditable不管是trur还是false都能有focus和blur事件
-         * @Editor: Naixor
-         * @Date: 2015.09.14
-         */
-            element.setAttribute("tabindex", -1);
-            element.classList.add("receiver");
-            element.onkeydown = element.onkeypress = element.onkeyup = dispatchKeyEvent;
-            element.addEventListener("compositionstart", dispatchKeyEvent);
-            // element.addEventListener('compositionend', dispatchKeyEvent);
-            this.container.appendChild(element);
-            // receiver 对象
-            var receiver = {
-                element: element,
-                selectAll: function() {
-                    // 保证有被选中的
-                    if (!element.innerHTML) element.innerHTML = "&nbsp;";
-                    var range = document.createRange();
-                    var selection = window.getSelection();
-                    range.selectNodeContents(element);
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                    element.focus();
-                },
-                /**
-             * @Desc: 增加enable和disable方法用于解决热核态的输入法屏蔽问题
-             * @Editor: Naixor
-             * @Date: 2015.09.14
-             */
-                enable: function() {
-                    element.setAttribute("contenteditable", true);
-                },
-                disable: function() {
-                    element.setAttribute("contenteditable", false);
-                },
-                /**
-             * @Desc: hack FF下div contenteditable的光标丢失BUG
-             * @Editor: Naixor
-             * @Date: 2015.10.15
-             */
-                fixFFCaretDisappeared: function() {
-                    element.removeAttribute("contenteditable");
-                    element.setAttribute("contenteditable", "true");
-                    element.blur();
-                    element.focus();
-                },
-                /**
-             * 以此事件代替通过mouse事件来判断receiver丢失焦点的事件
-             * @editor Naixor
-             * @Date 2015-12-2
-             */
-                onblur: function(handler) {
-                    element.onblur = handler;
-                }
-            };
-            receiver.selectAll();
-            minder.on("beforemousedown", receiver.selectAll);
-            minder.on("receiverfocus", receiver.selectAll);
-            minder.on("readonly", function() {
-                // 屏蔽minder的事件接受，删除receiver和hotbox
-                minder.disable();
-                editor.receiver.element.parentElement.removeChild(editor.receiver.element);
-                editor.hotbox.$container.removeChild(editor.hotbox.$element);
-            });
-            // 侦听器，接收到的事件会派发给所有侦听器
-            var listeners = [];
-            // 侦听指定状态下的事件，如果不传 state，侦听所有状态
-            receiver.listen = function(state, listener) {
-                if (arguments.length == 1) {
-                    listener = state;
-                    state = "*";
-                }
-                listener.notifyState = state;
-                listeners.push(listener);
-            };
-            function dispatchKeyEvent(e) {
-                e.is = function(keyExpression) {
-                    var subs = keyExpression.split("|");
-                    for (var i = 0; i < subs.length; i++) {
-                        if (key.is(this, subs[i])) return true;
-                    }
-                    return false;
-                };
-                var listener, jumpState;
-                for (var i = 0; i < listeners.length; i++) {
-                    listener = listeners[i];
-                    // 忽略不在侦听状态的侦听器
-                    if (listener.notifyState != "*" && listener.notifyState != fsm.state()) {
-                        continue;
-                    }
-                    /**
-                 *
-                 * 对于所有的侦听器，只允许一种处理方式：跳转状态。
-                 * 如果侦听器确定要跳转，则返回要跳转的状态。
-                 * 每个事件只允许一个侦听器进行状态跳转
-                 * 跳转动作由侦听器自行完成（因为可能需要在跳转时传递 reason），返回跳转结果即可。
-                 * 比如：
-                 *
-                 * ```js
-                 *  receiver.listen('normal', function(e) {
-                 *      if (isSomeReasonForJumpState(e)) {
-                 *          return fsm.jump('newstate', e);
-                 *      }
-                 *  });
-                 * ```
-                 */
-                    if (listener.call(null, e)) {
-                        return;
-                    }
-                }
-            }
-            this.receiver = receiver;
-        }
-        return module.exports = ReceiverRuntime;
-    }
-};
-
 //src/tool/debug.js
 /**
  * @fileOverview
@@ -1726,9 +568,9 @@ _p[18] = {
  * @author: techird
  * @copyright: Baidu FEX, 2014
  */
-_p[19] = {
+_p[10] = {
     value: function(require, exports, module) {
-        var format = _p.r(20);
+        var format = _p.r(11);
         function noop() {}
         function stringHash(str) {
             var hash = 0;
@@ -1757,7 +599,7 @@ _p[19] = {
 };
 
 //src/tool/format.js
-_p[20] = {
+_p[11] = {
     value: function(require, exports, module) {
         function format(template, args) {
             if (typeof args != "object") {
@@ -1780,7 +622,7 @@ _p[20] = {
  * @author: techird
  * @copyright: Baidu FEX, 2014
  */
-_p[21] = {
+_p[12] = {
     value: function(require, exports, module) {
         if (!("innerText" in document.createElement("a")) && "getSelection" in window) {
             HTMLElement.prototype.__defineGetter__("innerText", function() {
@@ -1827,7 +669,7 @@ _p[21] = {
  * @author: techird
  * @copyright: Baidu FEX, 2014
  */
-_p[22] = {
+_p[13] = {
     value: function(require, exports, module) {
         /*!
     * https://github.com/Starcounter-Jack/Fast-JSON-Patch
@@ -1913,9 +755,9 @@ _p[22] = {
 };
 
 //src/tool/key.js
-_p[23] = {
+_p[14] = {
     value: function(require, exports, module) {
-        var keymap = _p.r(24);
+        var keymap = _p.r(15);
         var CTRL_MASK = 4096;
         var ALT_MASK = 8192;
         var SHIFT_MASK = 16384;
@@ -1984,7 +826,7 @@ _p[23] = {
 };
 
 //src/tool/keymap.js
-_p[24] = {
+_p[15] = {
     value: function(require, exports, module) {
         var keymap = {
             Shift: 16,
@@ -2105,12 +947,12 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/fileImport/fileImport.html',
-    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default import\" title=\"{{ 'import' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" data-toggle=\"modal\" data-target=\"#importModal\" ng-click=\"updateMaplist()\"></button> <button type=\"button\" class=\"btn btn-default import-caption dropdown-toggle\" data-toggle=\"modal\" data-target=\"#importModal\" title=\"{{ 'import' | lang:'ui' }}\" ng-click=\"updateMaplist()\"><span class=\"caption\">{{ 'import' | lang:'ui' }}</span> <span class=\"sr-only\">{{ 'import' | lang:'ui' }}</span></button><div class=\"modal fade\" id=\"importModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\" style=\"width: 800px\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Import mind map</h4></div><div class=\"modal-body\" style=\"font-size: 12px\"><div style=\"width: 95%; margin: auto; border: 1px solid gray\"><table class=\"table\" style=\"width: 90%; margin: auto\"><caption style=\"font-size: 14px;font-weight: 600;color:#333\">Open mindmap from resource center:</caption><thead><tr><th style=\"width: 20%\">Name</th><th style=\"width: 20%\">Type</th><th style=\"width: 40%\">Description</th><th style=\"width: 20%\">Operation</th></tr></thead></table><div style=\"min-height:100px;max-height: 400px; overflow-y: auto\"><table class=\"table\" style=\"width: 90%;margin: auto\"><tbody><tr ng-repeat=\"item in mindmapRes\"><td style=\"width: 20%; overflow: hidden; word-break: break-word\">{{item.name}}</td><td style=\"width: 20%\">{{item.type}}</td><td style=\"width: 40%; overflow: hidden; word-break: break-word\">{{item.description}}</td><td style=\"width: 20%\"><span style=\"cursor:pointer\" class=\"glyphicon glyphicon-ok-circle\" title=\"Load this mindmap\" ng-click=\"mapLoad(item)\"></span> <span style=\"cursor:pointer; margin-left: 10px\" class=\"glyphicon glyphicon-download\" title=\"Load this mindmap\" ng-click=\"mapDownload(item)\"></span> <span style=\"cursor:pointer; margin-left: 10px\" class=\"glyphicon glyphicon-remove-circle\" title=\"Delete this mindmap\" ng-click=\"deleteMap(item)\"></span></td></tr></tbody></table></div></div><hr><div style=\"width: 90%; margin: auto\"><span style=\"font-size: 14px;font-weight: 600\">Open your own mindmap:</span> <input type=\"file\" id=\"fileInput\" style=\"margin-top: 15px\"><button type=\"button\" class=\"btn btn-info\" style=\"margin-top: 15px\" ng-click=\"mapImport()\">Upload</button></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
+    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default import\" title=\"{{ 'import' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" data-toggle=\"modal\" data-target=\"#importModal\" ng-click=\"updateMaplist()\"></button> <button type=\"button\" class=\"btn btn-default import-caption dropdown-toggle\" data-toggle=\"modal\" data-target=\"#importModal\" title=\"{{ 'import' | lang:'ui' }}\" ng-click=\"updateMaplist()\"><span class=\"caption\">{{ 'import' | lang:'ui' }}</span> <span class=\"sr-only\">{{ 'import' | lang:'ui' }}</span></button><div class=\"modal fade\" id=\"importModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\" style=\"width: 800px\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Import mind map</h4></div><div class=\"modal-body\" style=\"font-size: 12px\"><div style=\"width: 95%; margin: auto; border: 1px solid gray\"><table class=\"table\" style=\"width: 90%; margin: auto\"><caption style=\"font-size: 14px;font-weight: 600;color:#333\">Open mindmap from resource center:</caption><thead><tr><th style=\"width: 30%\">Name</th><th style=\"width: 50%\">Description</th><th style=\"width: 20%\">Operation</th></tr></thead></table><div style=\"min-height:100px;max-height: 400px; overflow-y: auto\"><table class=\"table\" style=\"width: 90%;margin: auto\"><tbody><tr ng-repeat=\"item in mindmapRes\"><td style=\"width: 30%\">{{item.name}}</td><td style=\"width: 50%\">{{item.description}}</td><td style=\"width: 20%\"><span style=\"cursor:pointer\" class=\"glyphicon glyphicon-ok-circle\" title=\"Load this mindmap\" ng-click=\"mapLoad(item)\"></span> <span style=\"cursor:pointer; margin-left: 20px\" class=\"glyphicon glyphicon-remove-circle\" title=\"Delete this mindmap\" ng-click=\"deleteMap(item)\"></span></td></tr></tbody></table></div></div><div style=\"width: 90%; margin: auto;margin-top: 30px\"><span style=\"font-size: 14px;font-weight: 600\">Open mindmap from resource center:</span> <input type=\"file\" id=\"fileInput\" style=\"margin-top: 15px\"><button type=\"button\" class=\"btn btn-info\" style=\"margin-top: 15px\" ng-click=\"mapImport()\">Upload</button></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
   );
 
 
   $templateCache.put('ui/directive/fileSave/fileSave.html',
-    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default save\" title=\"{{ 'save' | lang:'ui' }}\" ng-class=\"{'active': isopen}\"></button> <button type=\"button\" class=\"btn btn-default save-caption dropdown-toggle\" title=\"{{ 'save' | lang:'ui' }}\" dropdown-toggle><span class=\"caption\">{{ 'save' | lang:'ui' }}</span> <span class=\"caret\"></span> <span class=\"sr-only\">{{ 'save' | lang:'ui' }}</span></button><ul class=\"dropdown-menu\" role=\"menu\"><li data-toggle=\"modal\" ng-click=\"saveMapFun()\"><a href>Save (Save to current version)</a></li><li data-toggle=\"modal\" data-target=\"#saveasModal\"><a href>Save as (Save as a new file)</a></li></ul><div class=\"modal fade\" id=\"saveasModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Save mind map</h4></div><div class=\"modal-body\"><div><span style=\"font-size: 16px; margin-right: 20px\">Save the current mind map as format:</span><select class=\"form-control\" style=\"width:100px; display: initial\" id=\"datatypeSelect\"><option>json</option><option>md</option><option>km</option><option>png</option></select></div><div class=\"input-group\" style=\"margin-top: 20px\"><span class=\"input-group-addon\">File name:</span> <input type=\"text\" class=\"form-control\" id=\"mindmapName\" placeholder=\"Please fill in the name\"></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\" ng-click=\"saveasMapFun()\">Save as</button> <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
+    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default save\" title=\"{{ 'save' | lang:'ui' }}\" ng-class=\"{'active': isopen}\"></button> <button type=\"button\" class=\"btn btn-default save-caption dropdown-toggle\" title=\"{{ 'save' | lang:'ui' }}\" dropdown-toggle><span class=\"caption\">{{ 'save' | lang:'ui' }}</span> <span class=\"caret\"></span> <span class=\"sr-only\">{{ 'save' | lang:'ui' }}</span></button><ul class=\"dropdown-menu\" role=\"menu\"><li data-toggle=\"modal\" data-target=\"#saveModal\"><a href>Save</a></li><li data-toggle=\"modal\" data-target=\"#saveasModal\"><a href>Save as</a></li></ul><div class=\"modal fade\" id=\"saveModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Save mind map</h4></div><div class=\"modal-body\"><div style=\"margin: 10px 0\"><button type=\"button\" class=\"btn btn-info\" id=\"saveBtn\" ng-click=\"saveMapFun()\">Save to resource center</button> <button style=\"margin-left: 20px\" type=\"button\" id=\"downloadBtn\" ng-click=\"downloadMapFun()\" class=\"btn btn-info\">Download</button></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div><div class=\"modal fade\" id=\"saveasModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Save mind map</h4></div><div class=\"modal-body\"><div><span style=\"font-size: 16px; margin-right: 20px\">Save the current mind map as format:</span><select class=\"form-control\" style=\"width:100px; display: initial\" id=\"datatypeSelect\"><option>json</option><option>md</option><option>km</option><option>png</option></select></div><div class=\"input-group\" style=\"margin-top: 20px\"><span class=\"input-group-addon\">File name:</span> <input type=\"text\" class=\"form-control\" id=\"mindmapName\" placeholder=\"Please fill in the name\"></div><div style=\"margin-top: 20px\"><button type=\"button\" class=\"btn btn-info\" id=\"saveBtn\" ng-click=\"saveasMapFun()\">Save to resource center</button> <button style=\"float: right\" type=\"button\" id=\"downloadBtn\" ng-click=\"downloadMapFun()\" class=\"btn btn-info\">Download</button></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
   );
 
 
@@ -2130,7 +972,7 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/kityminderEditor/kityminderEditor.html',
-    "<div class=\"minder-editor-container\"><div class=\"top-tab\" top-tab=\"minder\" editor=\"editor\" ng-if=\"minder\"></div><div search-box minder=\"minder\" ng-if=\"minder\"></div><div class=\"minder-editor\"></div><div class=\"km-note\" note-editor minder=\"minder\" ng-if=\"minder\"></div><div class=\"note-previewer\" note-previewer ng-if=\"minder\"></div><div class=\"navigator\" navigator minder=\"minder\" ng-if=\"minder\"></div></div>"
+    "<div class=\"minder-editor-container\"><div class=\"minder-editor\" style=\"top:0px\"></div><div class=\"km-note\" note-editor minder=\"minder\" ng-if=\"minder\"></div><div class=\"note-previewer\" note-previewer ng-if=\"minder\"></div><div class=\"navigator\" navigator minder=\"minder\" ng-if=\"minder\"></div></div>"
   );
 
 
@@ -2205,7 +1047,7 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/searchBox/searchBox.html',
-    "<div id=\"search\" class=\"search-box clearfix\" ng-show=\"showSearch\"><div class=\"input-group input-group-sm search-input-wrap\"><input type=\"text\" id=\"search-input\" class=\"form-control search-input\" ng-model=\"keyword\" ng-keydown=\"handleKeyDown($event)\" aria-describedby=\"basic-addon2\"> <span class=\"input-group-addon search-addon\" id=\"basic-addon2\" ng-show=\"showTip\" ng-bind=\"'No.' + curIndex + '，Total: ' + resultNum \"></span></div><div class=\"btn-group btn-group-sm prev-and-next-btn\" role=\"group\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"doSearch(keyword, 'prev')\"><span class=\"glyphicon glyphicon-chevron-up\"></span></button> <button type=\"button\" class=\"btn btn-default\" ng-click=\"doSearch(keyword, 'next')\"><span class=\"glyphicon glyphicon-chevron-down\"></span></button></div><div class=\"close-search\" ng-click=\"exitSearch()\"><span class=\"glyphicon glyphicon-remove\"></span></div></div>"
+    "<div id=\"search\" class=\"search-box clearfix\" ng-show=\"showSearch\"><div class=\"input-group input-group-sm search-input-wrap\"><input type=\"text\" id=\"search-input\" class=\"form-control search-input\" ng-model=\"keyword\" ng-keydown=\"handleKeyDown($event)\" aria-describedby=\"basic-addon2\"> <span class=\"input-group-addon search-addon\" id=\"basic-addon2\" ng-show=\"showTip\" ng-bind=\"'第 ' + curIndex + ' 条，共 ' + resultNum + ' 条'\"></span></div><div class=\"btn-group btn-group-sm prev-and-next-btn\" role=\"group\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"doSearch(keyword, 'prev')\"><span class=\"glyphicon glyphicon-chevron-up\"></span></button> <button type=\"button\" class=\"btn btn-default\" ng-click=\"doSearch(keyword, 'next')\"><span class=\"glyphicon glyphicon-chevron-down\"></span></button></div><div class=\"close-search\" ng-click=\"exitSearch()\"><span class=\"glyphicon glyphicon-remove\"></span></div></div>"
   );
 
 
@@ -2235,17 +1077,12 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/topTab/topTab.html',
-    "<tabset><tab heading=\"{{ 'file' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('file')\" select=\"setCurTab('file')\"><file-import minder=\"minder\"></file-import><file-save minder=\"minder\"></file-save><version-manager minder=\"minder\"></version-manager></tab><tab heading=\"{{ 'idea' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('idea')\" select=\"setCurTab('idea')\"><undo-redo editor=\"editor\"></undo-redo><append-node minder=\"minder\"></append-node><arrange minder=\"minder\"></arrange><operation minder=\"minder\"></operation><hyper-link minder=\"minder\"></hyper-link><image-btn minder=\"minder\"></image-btn><note-btn minder=\"minder\"></note-btn><priority-editor minder=\"minder\"></priority-editor><progress-editor minder=\"minder\"></progress-editor><resource-editor minder=\"minder\"></resource-editor></tab><tab heading=\"{{ 'appearence' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('appearance')\" select=\"setCurTab('appearance')\"><template-list minder=\"minder\" class=\"inline-directive\"></template-list><theme-list minder=\"minder\"></theme-list><layout minder=\"minder\" class=\"inline-directive\"></layout><style-operator minder=\"minder\" class=\"inline-directive\"></style-operator><font-operator minder=\"minder\" class=\"inline-directive\"></font-operator></tab><tab heading=\"{{ 'view' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('view')\" select=\"setCurTab('view')\"><expand-level minder=\"minder\"></expand-level><select-all minder=\"minder\"></select-all><search-btn minder=\"minder\"></search-btn></tab></tabset>"
+    "<tabset><tab heading=\"{{ 'idea' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('idea')\" select=\"setCurTab('idea')\"><undo-redo editor=\"editor\"></undo-redo><append-node minder=\"minder\"></append-node><arrange minder=\"minder\"></arrange><operation minder=\"minder\"></operation><hyper-link minder=\"minder\"></hyper-link><image-btn minder=\"minder\"></image-btn><note-btn minder=\"minder\"></note-btn><priority-editor minder=\"minder\"></priority-editor><progress-editor minder=\"minder\"></progress-editor><resource-editor minder=\"minder\"></resource-editor></tab><tab heading=\"{{ 'appearence' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('appearance')\" select=\"setCurTab('appearance')\"><template-list minder=\"minder\" class=\"inline-directive\"></template-list><theme-list minder=\"minder\"></theme-list><layout minder=\"minder\" class=\"inline-directive\"></layout><style-operator minder=\"minder\" class=\"inline-directive\"></style-operator><font-operator minder=\"minder\" class=\"inline-directive\"></font-operator></tab><tab heading=\"{{ 'view' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('view')\" select=\"setCurTab('view')\"><expand-level minder=\"minder\"></expand-level><select-all minder=\"minder\"></select-all><search-btn minder=\"minder\"></search-btn></tab><tab heading=\"{{ 'file' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('file')\" select=\"setCurTab('file')\"><file-import minder=\"minder\"></file-import><file-save minder=\"minder\"></file-save></tab></tabset>"
   );
 
 
   $templateCache.put('ui/directive/undoRedo/undoRedo.html',
     "<div class=\"km-btn-group do-group\"><div class=\"km-btn-item undo\" ng-disabled=\"editor.history.hasUndo() == false\" ng-click=\"editor.history.hasUndo() == false || editor.history.undo();\" title=\"{{ 'undo' | lang:'ui' }}\"><i class=\"km-btn-icon\"></i></div><div class=\"km-btn-item redo\" ng-disabled=\"editor.history.hasRedo() == false\" ng-click=\"editor.history.hasRedo() == false || editor.history.redo()\" title=\"{{ 'redo' | lang:'ui' }}\"><i class=\"km-btn-icon\"></i></div></div>"
-  );
-
-
-  $templateCache.put('ui/directive/versionManager/versionManager.html',
-    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default version\" title=\"{{ 'version' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" data-toggle=\"modal\" data-target=\"#versinModal\" ng-click=\"updateMaplist()\"></button> <button type=\"button\" class=\"btn btn-default version-caption dropdown-toggle\" data-toggle=\"modal\" data-target=\"#versinModal\" title=\"{{ 'version' | lang:'ui' }}\" ng-click=\"updateMaplist()\"><span class=\"caption\">{{ 'version' | lang:'ui' }}</span> <span class=\"sr-only\">{{ 'version' | lang:'ui' }}</span></button><div class=\"modal fade\" id=\"versinModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\" style=\"width: 400px;margin-left: 5px\"><div class=\"modal-content\"><div class=\"modal-header\" style=\"padding:5px 15px\"><h4 class=\"modal-title\" id=\"myModalLabel\" style=\"font-weight: bold\">Version list</h4></div><div class=\"modal-body\" style=\"font-size: 12px; padding: 10px 0\"><div style=\"width: 95%; margin: auto; border: 1px solid gray\"><table class=\"table\" style=\"width: 96%; margin: auto\"><caption style=\"font-size: 14px;font-weight: 600;color:#333\">Historical versions:</caption><thead><tr><th style=\"width: 35%\">Name</th><th style=\"width: 20%\">Editor</th><th style=\"width: 25%\">Edit time</th><th style=\"width: 20%\">Operation</th></tr></thead></table><div style=\"min-height:200px;max-height: 400px; overflow-y: auto\"><table class=\"table\" style=\"width: 96%;margin: auto\"><tbody><tr ng-repeat=\"item in mindmapRes\"><td style=\"width: 35%; overflow: hidden; word-break: break-word\">{{item.name}}</td><td style=\"width: 20%; overflow: hidden; word-break: break-word\">{{item.uploaderName}}</td><td style=\"width: 25%\">{{item.uploadTime}}</td><td style=\"width: 20%\"><span style=\"cursor:pointer\" class=\"glyphicon glyphicon-ok-circle\" title=\"Load this mindmap\" ng-click=\"mapLoad(item)\"></span> <span style=\"cursor:pointer; margin-left: 20px\" class=\"glyphicon glyphicon-remove-circle\" title=\"Delete this mindmap\" ng-click=\"deleteMap(item)\"></span></td></tr></tbody></table></div></div></div><div class=\"modal-footer\" style=\"padding:5px 15px\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
   );
 
 
@@ -2531,8 +1368,6 @@ angular.module('kityminderEditor')
 					'save':'Save',
 					
 					'import':'Import',
-					
-					'version':'Version list',
 
 					'expandtoleaf': 'Expand',
 
@@ -2543,7 +1378,7 @@ angular.module('kityminderEditor')
 
 					'tabs': {
 						'file':'File',
-						'idea': 'Edit',
+						'idea': 'Idea',
 						'appearence': 'Appearence',
 						'view': 'View'
 					},
@@ -2915,7 +1750,7 @@ angular.module('kityminderEditor').service('revokeDialog', ['$modal', 'minder.se
         // 触发导入节点或导出节点对话框
         var minder = window.minder;
         var editor = window.editor;
-        var parentFSM = editor.hotbox.getParentFSM();
+        // var parentFSM = editor.hotbox.getParentFSM();
 
 
         minder.on('importNodeData', function() {
@@ -3643,7 +2478,6 @@ angular.module('kityminderEditor')
                 scope.updateMaplist = updateMaplist;
                 scope.mapImport = mapImport;
                 scope.mapLoad = mapLoad;
-                scope.mapDownload = mapDownload;
                 scope.deleteMap = deleteMap;
 
                 function updateMaplist() {
@@ -3712,9 +2546,6 @@ angular.module('kityminderEditor')
                             var content = reader.result;
                             editor.minder.importData(fileType, content).then(function (data) {
                                 $(fileInput).val('');
-
-                                // 初始化原始导图
-                                originalMap = JSON.stringify(editor.minder.exportJson());
                             });
                             // 导图信息初始化
                             mindmapInfo = {};
@@ -3724,74 +2555,52 @@ angular.module('kityminderEditor')
                 }
 
                 function mapLoad(map) {
-                    var info = RouteInfo.getInfo();
-                    if (info.pageId != "" && info.userId != "") {
-                        var fileType = map.name.replace(/.+\./, "");
-                        switch (fileType) {
-                            case 'md':
-                                fileType = 'markdown';
-                                break;
-                            case 'km':
-                            case 'json':
-                                fileType = 'json';
-                                break;
-                            default:
-                                console.log("File not supported!");
-                                alert('only support data format(*.km, *.md, *.json)');
-                                return;
-                        }
+                    var fileType = map.name.replace(/.+\./, "");
+                    switch (fileType) {
+                        case 'md':
+                            fileType = 'markdown';
+                            break;
+                        case 'km':
+                        case 'json':
+                            fileType = 'json';
+                            break;
+                        default:
+                            console.log("File not supported!");
+                            alert('only support data format(*.km, *.md, *.json)');
+                            return;
+                    }
 
-                        try {
+                    try {
 
-                            var url = "http://" + RouteInfo.getIPPort() + map.pathURL;
-                            var xhr = new XMLHttpRequest();
-                            xhr.open("GET", url, true);
-                            xhr.onload = function (e) {
-                                if (xhr.status == 200) {
-                                    var file = xhr.response;
+                        var url = "http://" + RouteInfo.getIPPort() + map.pathURL;
+                        var xhr = new XMLHttpRequest();
+                        xhr.open("GET", url, true);
+                        xhr.onload = function (e) {
+                            if (xhr.status == 200) {
+                                var file = xhr.response;
 
-                                    editor.minder.importData(fileType, file).then(function (data) {
-                                        $(fileInput).val('');
+                                editor.minder.importData(fileType, file).then(function (data) {
+                                    $(fileInput).val('');
+                                });
 
-                                        // 初始化原始导图
-                                        originalMap = JSON.stringify(editor.minder.exportJson());
-                                    });
-
-                                    mindmapInfo = {
-                                        name: map.name,
-                                        resourceId: map.resourceId,
-                                        uploaderId: map.uploaderId
-                                    }
+                                mindmapInfo = {
+                                    name: map.name,
+                                    resourceId: map.resourceId
                                 }
-                            };
-                            xhr.send();
-                        }
-                        catch (ex) {
-                            mindmapInfo = {};
-                            console.log("import mindmap error");
-                        }
+                            }
+                        };
+                        xhr.send();
                     }
-                    else if (info.pageId != "") {
-                        alert("Missing page information!");
-                    }
-                    else {
-                        alert("Missing user information, please log in!");
+                    catch (ex) {
+                        mindmapInfo = {};
+                        console.log("import mindmap error");
                     }
                 }
-
-                function mapDownload(map) {
-                    var a = document.createElement("a");
-                    a.href = 'http://' + RouteInfo.getIPPort() + map.pathURL;
-                    $("body").append(a);
-                    a.click();
-                    $(a).remove();
-                }
-
 
                 function deleteMap(map) {
                     try {
                         var info = RouteInfo.getInfo();
-                        if (info.pageId != "" && info.userId != "") {
+                        if (info.pageId != "") {
 
                             var folderId = info.pageId;
                             $.ajax({
@@ -3811,31 +2620,12 @@ angular.module('kityminderEditor')
                                 }
                             });
                         }
-                        else if (info.pageId != "") {
-                            alert("Missing page information!");
-                        }
-                        else {
-                            alert("Missing user information, please log in!");
-                        }
                     }
                     catch (ex) {
                         console.log("fail")
                     }
                 }
-
-                function getBlobBydataURI(dataurl) {
-                    var arr = dataurl.split(","),
-                        mime = arr[0].match(/:(.*?);/)[1],
-                        bstr = atob(arr[1]),
-                        n = bstr.length,
-                        u8arr = new Uint8Array(n);
-                    while (n--) {
-                        u8arr[n] = bstr.charCodeAt(n);
-                    }
-                    return new Blob([u8arr], { type: mime });
-                }
             }
-            
         }
     }]);
 angular.module('kityminderEditor')
@@ -3850,30 +2640,31 @@ angular.module('kityminderEditor')
             link: function (scope) {
                 scope.saveMapFun = saveMapFun;
                 scope.saveasMapFun = saveasMapFun;
-                // scope.downloadMapFun = downloadMapFun;
+                scope.downloadMapFun = downloadMapFun;
 
                 function saveMapFun() {
-                    var info = RouteInfo.getInfo();
-                    if (info.pageId != "" && info.userId != "") {
+                    if (mindmapInfo != {} && mindmapInfo.name != undefined && mindmapInfo.resourceId != undefined
+                        && mindmapInfo.name != "" && mindmapInfo.resourceId != "") {
 
-                        if (mindmapInfo != {} && mindmapInfo.name != undefined && mindmapInfo.resourceId != undefined
-                            && mindmapInfo.name != "" && mindmapInfo.resourceId != "" && info.userId == mindmapInfo.uploaderId) {
+                        var datatype = mindmapInfo.name.substring(mindmapInfo.name.lastIndexOf('.') + 1);
 
-                            var datatype = mindmapInfo.name.substring(mindmapInfo.name.lastIndexOf('.') + 1);
+                        switch (datatype) {
+                            case 'km':
+                                exportType = 'json';
+                                break;
+                            case 'md':
+                                exportType = 'markdown';
+                                break;
+                            default:
+                                exportType = datatype;
+                                break;
+                        }
 
-                            switch (datatype) {
-                                case 'km':
-                                    exportType = 'json';
-                                    break;
-                                case 'md':
-                                    exportType = 'markdown';
-                                    break;
-                                default:
-                                    exportType = datatype;
-                                    break;
-                            }
+                        editor.minder.exportData(exportType).then(function (file) {
 
-                            editor.minder.exportData(exportType).then(function (file) {
+                            var info = RouteInfo.getInfo();
+                            if (info.pageId != "" && info.userId != "") {
+
                                 //thumbnail
                                 editor.minder.exportData('png').then(function (content) {
                                     //压缩
@@ -3901,7 +2692,7 @@ angular.module('kityminderEditor')
                                         var fileBlob = new File([blob], filename);
 
                                         // 工具信息
-                                        var toolInfo = { toolName: "Mind map", toolUrl: "/GeoProblemSolving/Collaborative/Mindmap/index.html" };
+                                        var toolInfo = {toolName:"Mind map", toolUrl:"/GeoProblemSolving/Collaborative/Mindmap/index.html"};
 
                                         var formData = new FormData();
                                         formData.append("resourceId", mindmapInfo.resourceId);
@@ -3918,17 +2709,12 @@ angular.module('kityminderEditor')
                                                 data: formData,
                                                 processData: false,
                                                 contentType: false,
-                                                success: function (data) {                                                    
+                                                success: function (data) {
                                                     if (data == "Size over" || data == "Fail" || data == "Offline") {
-                                                        alert("Fail to save...");
-                                                    }
-                                                    else if(data.failed.length > 0){
-                                                        alert("Fail to save...");
+                                                        console.log(data);
                                                     }
                                                     else if (data.uploaded.length > 0) {
                                                         alert("Save this mind map successfully");
-                                                        // 初始化原始导图
-                                                        originalMap = JSON.stringify(editor.minder.exportJson());
                                                     }
                                                 },
                                                 error: function (err) {
@@ -3942,17 +2728,19 @@ angular.module('kityminderEditor')
 
                                     }
                                 });
-                            });
-                        }
-                        else {
-                            alert("Please click \"Save as (Save as a new file)\", and fill in the file name.");
-                        }
-                    }
-                    else if (info.pageId != "") {
-                        alert("Missing page information!");
+                            }
+                            else if(info.pageId != "" ){
+                                alert("Missing page information!");
+                            }
+                            else{                        
+                                alert("Missing user information, please log in!");
+                            }
+
+                        });
+
                     }
                     else {
-                        alert("Missing user information, please log in!");
+                        alert("Please click \"Save as\".");
                     }
                 }
 
@@ -4003,7 +2791,7 @@ angular.module('kityminderEditor')
                                         var fileBlob = new File([blob], filename);
 
                                         // 工具信息
-                                        var toolInfo = { toolName: "Mind map", toolUrl: "/GeoProblemSolving/Collaborative/Mindmap/index.html" };
+                                        var toolInfo = {toolName:"Mind map", toolUrl:"/GeoProblemSolving/Collaborative/Mindmap/index.html"};
 
                                         var formData = new FormData();
                                         formData.append("file", fileBlob);
@@ -4022,24 +2810,17 @@ angular.module('kityminderEditor')
                                                 data: formData,
                                                 processData: false,
                                                 contentType: false,
-                                                success: function (data) {                                                    
+                                                success: function (data) {
                                                     if (data == "Size over" || data == "Fail" || data == "Offline") {
-                                                        alert("Fail to save...");
-                                                    }
-                                                    else if(data.failed.length > 0){
-                                                        alert("Fail to save...");
+                                                        console.log(data);
                                                     }
                                                     else if (data.uploaded.length > 0) {
                                                         alert("Save this mind map successfully");
 
                                                         mindmapInfo = {
                                                             name: filename,
-                                                            resourceId: data.uploaded[0].resourceId,
-                                                            uploaderId: info.userId
+                                                            resourceId: data.uploaded[0].resourceId
                                                         };
-
-                                                        // 初始化原始导图
-                                                        originalMap = JSON.stringify(editor.minder.exportJson());
                                                     }
                                                 },
                                                 error: function (err) {
@@ -4056,14 +2837,98 @@ angular.module('kityminderEditor')
 
                                 });
                             }
-                            else if (info.pageId != "") {
+                            else if(info.pageId != "" ){
                                 alert("Missing page information!");
                             }
-                            else {
+                            else{                        
                                 alert("Missing user information, please log in!");
                             }
 
                         });
+                    }
+                }
+
+                function downloadMapFun() {
+
+                    if (mindmapInfo != {} && mindmapInfo.name != undefined && mindmapInfo.name != "") {
+
+                        var datatype = mindmapInfo.name.substring(mindmapInfo.name.lastIndexOf('.') + 1);
+
+                        switch (datatype) {
+                            case 'km':
+                                exportType = 'json';
+                                break;
+                            case 'md':
+                                exportType = 'markdown';
+                                break;
+                            default:
+                                exportType = datatype;
+                                break;
+                        }
+
+                        editor.minder.exportData(exportType).then(function (content) {
+
+                            // 文件下载
+                            if (datatype == "png") {
+                                var arr = content.split(','), mime = arr[0].match(/:(.*?);/)[1],
+                                    bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+                                while (n--) {
+                                    u8arr[n] = bstr.charCodeAt(n);
+                                }
+
+                                var blob = new Blob([u8arr], { type: mime }),
+                                    url = URL.createObjectURL(blob);
+                            }
+                            else {
+                                var blob = new Blob([content]),
+                                    url = URL.createObjectURL(blob);
+                            }
+
+                            var a = document.createElement("a");
+                            a.download = mindmapInfo.name;
+                            a.href = url;
+                            $("body").append(a);
+                            a.click();
+                            $(a).remove();
+                        });
+
+                    } else if ($('#mindmapName').val() != "" && $('#mindmapName').val() != undefined) {
+                        datatype = $('#datatypeSelect').val();
+
+                        switch (datatype) {
+                            case 'km':
+                                exportType = 'json';
+                                break;
+                            case 'md':
+                                exportType = 'markdown';
+                                break;
+                            default:
+                                exportType = datatype;
+                                break;
+                        }
+
+                        editor.minder.exportData(exportType).then(function (content) {
+
+                            // 文件下载
+                            if (datatype == "png") {
+                                var blob = getBlobBydataURI(content);
+                                var url = URL.createObjectURL(blob);
+                            }
+                            else {
+                                var blob = new Blob([content]),
+                                    url = URL.createObjectURL(blob);
+                            }
+
+                            var a = document.createElement("a");
+                            a.download = $('#mindmapName').val() + '.' + datatype;
+                            a.href = url;
+                            $("body").append(a);
+                            a.click();
+                            $(a).remove();
+                        });
+                    }
+                    else {
+
                     }
                 }
 
@@ -4324,17 +3189,12 @@ angular.module('kityminderEditor')
 										if (xhr.status == 200) {
 											var file = xhr.response;
 
-											editor.minder.importData(fileType, file).then(function () {
-												// 初始化原始导图
-												originalMap = JSON.stringify(editor.minder.exportJson());
-											});
+											editor.minder.importData(fileType, file);
 
 											mindmapInfo = {
 												name: map.name,
-												resourceId: map.resourceId,
-												uploaderId: map.uploaderId
-											};
-
+												resourceId: map.resourceId
+											}
 										}
 									};
 									xhr.send();
@@ -4345,47 +3205,17 @@ angular.module('kityminderEditor')
 							}
 
 						}
-
-						/*** for collaboration * start ***/
-						function getSocketConnect(data) {
-
-							if (data != {}) {
-								if (data.messageType == "Message" && data.event == "contentchange") {
-									var mindmap = JSON.parse(data.value);
-									editor.minder.importJson(mindmap);
-									window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());
-								}
-							}
-						}
+						
 						editor.minder.on('contentchange', function () {
 							// window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());							
 						});
 
 						function contentListening() {
-							currentMap = JSON.stringify(editor.minder.exportJson());
-							if (window.localStorage.__dev_minder_content !== currentMap) {
-								window.localStorage.__dev_minder_content = currentMap;
 
-								if (Messages.isConnection()) {
-									// websocket
-									var socketContent = {
-										"messageType": "Message",
-										"event": "contentchange",
-										"value": window.localStorage.__dev_minder_content
-									}
-									Messages.sendSock("mindmap", socketContent, getSocketConnect);
-								}
+							if (window.localStorage.__dev_minder_content !== JSON.stringify(editor.minder.exportJson())) {
+								window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());								
 							}
 
-							//心跳机制
-							if (Messages.isConnection()) {
-								var socketContent = {
-									"messageType": "Ping",
-									"event": "pong"
-								}
-								Messages.sendSock("ping", socketContent, getSocketConnect);
-
-							}
 						}
 						setInterval(contentListening, 1000);
 						/*** for collaboration * end ***/
@@ -5497,297 +4327,5 @@ angular.module('kityminderEditor')
             }
         }
     });
-angular.module('kityminderEditor')
-    .directive('versionManager', ['RouteInfo', function (RouteInfo) {
-        return {
-            restrict: 'E',
-            templateUrl: 'ui/directive/versionManager/versionManager.html',
-            scope: {
-                minder: '=',
-                mindmapRes: '=?'
-            },
-            replace: true,
-            link: function (scope) {
-                scope.updateMaplist = updateMaplist;
-                scope.mapLoad = mapLoad;
-                scope.deleteMap = deleteMap;
-                // scope.saveMap = saveMap;
-
-                function updateMaplist() {
-                    var maps = [];
-
-                    var info = RouteInfo.getInfo();
-                    if (info.pageId != "") {
-
-                        var folderId = info.pageId;
-                        try {
-                            $.ajax({
-                                url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
-                                type: "GET",
-                                async: false,
-                                success: function (data) {
-                                    if (data == "Fail") {
-                                        console.log(data);
-                                    }
-                                    else if (data.files.length != undefined) {
-
-                                        console.log("success!");
-                                        for (var i = data.files.length - 1; i >= 0; i--) {
-                                            if (data.files[i].type == "toolData:Mindmap") {
-                                                maps.push(data.files[i]);
-                                            }
-                                        }
-                                        scope.mindmapRes = maps;
-                                    }
-
-                                },
-                                error: function (err) {
-                                    console.log("fail.");
-                                }
-                            });
-                        }
-                        catch (ex) {
-                            console.log("fail")
-                        }
-                    }
-                    else {
-                        alert("Missing page information!");
-                    }
-                }
-                function mapLoad(map) {
-                    var info = RouteInfo.getInfo();
-                    if (info.pageId != "" && info.userId != "") {
-                        var fileType = map.name.replace(/.+\./, "");
-                        switch (fileType) {
-                            case 'md':
-                                fileType = 'markdown';
-                                break;
-                            case 'km':
-                            case 'json':
-                                fileType = 'json';
-                                break;
-                            default:
-                                console.log("File not supported!");
-                                alert('only support data format(*.km, *.md, *.json)');
-                                return;
-                        }
-
-                        try {
-
-                            var url = "http://" + RouteInfo.getIPPort() + map.pathURL;
-                            var xhr = new XMLHttpRequest();
-                            xhr.open("GET", url, true);
-                            xhr.onload = function (e) {
-                                if (xhr.status == 200) {
-                                    var file = xhr.response;
-
-                                    editor.minder.importData(fileType, file).then(function (data) {
-                                        $(fileInput).val('');
-
-                                        // 初始化原始导图
-                                        originalMap = JSON.stringify(editor.minder.exportJson());
-                                    });
-
-                                    mindmapInfo = {
-                                        name: map.name,
-                                        resourceId: map.resourceId,
-                                        uploaderId: map.uploaderId
-                                    }
-                                }
-                            };
-                            xhr.send();
-                        }
-                        catch (ex) {
-                            mindmapInfo = {};
-                            console.log("import mindmap error");
-                        }
-                    }
-                    else if (info.pageId != "") {
-                        alert("Missing page information!");
-                    }
-                    else {
-                        alert("Missing user information, please log in!");
-                    }
-                }
-
-                function deleteMap(map) {
-                    try {
-                        var info = RouteInfo.getInfo();
-                        if (map.uploaderId == info.userId) {
-                            if (info.pageId != "" && info.userId != "") {
-
-                                var folderId = info.pageId;
-                                $.ajax({
-                                    url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/removeFile?fileId=' + map.resourceId + '&folderId=' + folderId,
-                                    type: "GET",
-                                    async: false,
-                                    success: function (data) {
-                                        if (data == "Fail") {
-                                        }
-                                        else {
-                                            alert("Delete the mindmap successfully");
-                                            updateMaplist();
-                                        }
-                                    },
-                                    error: function (err) {
-                                        alert("Fail to delete the mindmap");
-                                    }
-                                });
-                            }
-                            else if (info.pageId != "") {
-                                alert("Missing page information!");
-                            }
-                            else {
-                                alert("Missing user information, please log in!");
-                            }
-                        }
-                        else {
-                            alert("Just your own versions can be deleted.")
-                        }
-                    }
-                    catch (ex) {
-                        console.log("fail")
-                    }
-                }
-
-                function saveMap() {
-                    var info = RouteInfo.getInfo();
-                    if (info.pageId != "" && info.userId != "") {
-
-                        if (mindmapInfo != {} && mindmapInfo.name != undefined && mindmapInfo.resourceId != undefined
-                            && mindmapInfo.name != "" && mindmapInfo.resourceId != "") {
-
-                            var datatype = mindmapInfo.name.substring(mindmapInfo.name.lastIndexOf('.') + 1);
-
-                            switch (datatype) {
-                                case 'km':
-                                    exportType = 'json';
-                                    break;
-                                case 'md':
-                                    exportType = 'markdown';
-                                    break;
-                                default:
-                                    exportType = datatype;
-                                    break;
-                            }
-
-                            editor.minder.exportData(exportType).then(function (file) {
-                                //thumbnail
-                                editor.minder.exportData('png').then(function (content) {
-                                    //压缩
-                                    var canvas = document.createElement('canvas'),
-                                        context = canvas.getContext('2d');
-                                    // canvas对图片进行缩放
-                                    canvas.width = 120;
-                                    canvas.height = 120;
-
-                                    var image = new Image()
-                                    image.src = content;
-                                    image.onload = function () {
-                                        // 清除画布,图片压缩
-                                        context.clearRect(0, 0, 120, 120);
-                                        context.drawImage(image, 0, 0, 120, 120);
-
-                                        var thumbnailUrl = canvas.toDataURL();
-                                        var thumbnailBlob = getBlobBydataURI(thumbnailUrl);
-                                        var thumbnailName = $('#mindmapName').val() + ".png";
-                                        var thumbnailBlobFile = new File([thumbnailBlob], "thumbnail_" + thumbnailName);
-
-                                        // 文件上传
-                                        var blob = new Blob([file]);
-                                        var filename = mindmapInfo.name;
-                                        var fileBlob = new File([blob], filename);
-
-                                        // 工具信息
-                                        var toolInfo = { toolName: "Mind map", toolUrl: "/GeoProblemSolving/Collaborative/Mindmap/mindmap.html" };
-
-                                        // resourceId
-                                        var formData = new FormData();
-                                        if (mindmapInfo.uploaderId == info.userId) {
-                                            formData.append("resourceId", mindmapInfo.resourceId);
-                                            formData.append("file", fileBlob);
-                                            formData.append("uploaderId", info.userId);
-                                            formData.append("folderId", info.pageId);
-                                            formData.append("thumbnail", thumbnailBlobFile);
-                                            formData.append("editToolInfo", JSON.stringify(toolInfo));
-                                        }
-                                        else {
-                                            formData.append("file", fileBlob);
-                                            formData.append("description", "Collaborative mindmap tool");
-                                            formData.append("type", "toolData:Mindmap");
-                                            formData.append("uploaderId", info.userId);
-                                            formData.append("privacy", "private");
-                                            formData.append("folderId", info.pageId);
-                                            formData.append("thumbnail", thumbnailBlobFile);
-                                            formData.append("editToolInfo", JSON.stringify(toolInfo));
-                                        }
-
-                                        try {
-                                            $.ajax({
-                                                url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/uploadToFolder',
-                                                type: "POST",
-                                                data: formData,
-                                                processData: false,
-                                                contentType: false,
-                                                success: function (data) {
-                                                    if (data == "Size over" || data == "Fail" || data == "Offline") {
-                                                        alert("Fail to save...");
-                                                    }
-                                                    else if (data.failed.length > 0) {
-                                                        alert("Fail to save...");
-                                                    }
-                                                    else if (data.uploaded.length > 0) {
-                                                        alert("Save this mind map successfully");
-
-                                                        if (indmapInfo.uploaderId != info.userId) {
-                                                            mindmapInfo = {
-                                                                name: filename,
-                                                                resourceId: data.uploaded[0].resourceId,
-                                                                uploaderId: info.userId
-                                                            }
-                                                        }
-                                                        // 初始化原始导图
-                                                        originalMap = JSON.stringify(editor.minder.exportJson());
-                                                    }
-                                                },
-                                                error: function (err) {
-                                                    console.log("fail.");
-                                                }
-                                            });
-                                        }
-                                        catch (ex) {
-                                            console.log("fail")
-                                        }
-
-                                    }
-                                });
-                            });
-                        }
-                        else {
-                            alert("Please click \"Save as (Save as a new file)\".");
-                        }
-                    }
-                    else if (info.pageId != "") {
-                        alert("Missing page information!");
-                    }
-                    else {
-                        alert("Missing user information, please log in!");
-                    }
-                }
-
-                function getBlobBydataURI(dataurl) {
-                    var arr = dataurl.split(","),
-                        mime = arr[0].match(/:(.*?);/)[1],
-                        bstr = atob(arr[1]),
-                        n = bstr.length,
-                        u8arr = new Uint8Array(n);
-                    while (n--) {
-                        u8arr[n] = bstr.charCodeAt(n);
-                    }
-                    return new Blob([u8arr], { type: mime });
-                }
-            }
-        }
-    }]);
 use('expose-editor');
 })();

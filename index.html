@@ -60,14 +60,8 @@
 </head>
 
 <body ng-app="kityminderDemo" ng-controller="MainController">
-    <!-- <h1 class="editor-title">Collaborative mindmap tool - Powered by KityMinder-Editor
-        <collab-panel participants="participants" drawer="drawer" collaboration="collaboration" draw="draw"
-            leftApply="leftApply"></collab-panel>
-    </h1> -->
-    <kityminder-editor on-init="initEditor(editor, minder)" style="top:0px"></kityminder-editor>
-    <div id="edit-mask" style="width:100%;height: 100%; z-index: 100;position: absolute;display: none;"
-        title="Other user may be drawing the mind map">
-    </div>
+    <h1 class="editor-title">Collaborative mindmap tool <span style="font-size: 10px;"> - Powered by KityMinder-Editor</span> <span style="float: right;">Note: Before editing the mind map, please login.</span></h1>
+    <kityminder-editor on-init="initEditor(editor, minder)"></kityminder-editor>
 </body>
 
 <!-- bower:js -->
@@ -116,38 +110,19 @@
 <script src="ui/directive/appendNode/appendNode.directive.js"></script>
 <script src="ui/directive/arrange/arrange.directive.js"></script>
 <script src="ui/directive/operation/operation.directive.js"></script>
-<script src="ui/directive/hyperLink/hyperLink.directive.js"></script>
-<script src="ui/directive/imageBtn/imageBtn.directive.js"></script>
 <script src="ui/directive/noteBtn/noteBtn.directive.js"></script>
 <script src="ui/directive/resourceEditor/resourceEditor.directive.js"></script>
-<script src="ui/directive/priorityEditor/priorityEditor.directive.js"></script>
-<script src="ui/directive/progressEditor/progressEditor.directive.js"></script>
 <script src="ui/directive/noteEditor/noteEditor.directive.js"></script>
 <script src="ui/directive/notePreviewer/notePreviewer.directive.js"></script>
 <script src="ui/directive/kityminderEditor/kityminderEditor.directive.js"></script>
-<script src="ui/directive/templateList/templateList.directive.js"></script>
-<script src="ui/directive/themeList/themeList.directive.js"></script>
 <script src="ui/directive/layout/layout.directive.js"></script>
-<script src="ui/directive/styleOperator/styleOperator.directive.js"></script>
-<script src="ui/directive/fontOperator/fontOperator.directive.js"></script>
-<script src="ui/directive/expandLevel/expandLevel.directive.js"></script>
-<script src="ui/directive/selectAll/selectAll.directive.js"></script>
-<script src="ui/directive/colorPanel/colorPanel.directive.js"></script>
 <script src="ui/directive/navigator/navigator.directive.js"></script>
-<script src="ui/directive/searchBox/searchBox.directive.js"></script>
-<script src="ui/directive/searchBtn/searchBtn.directive.js"></script>
-<script src="ui/directive/fileSave/fileSave.directive.js"></script>
-<script src="ui/directive/fileImport/fileImport.directive.js"></script>
-<script src="ui/directive/versionManager/versionManager.directive.js"></script>
 
 <script>
     // 'use strict';
 
     // 思维导图ID，标注唯一性
     var mindmapInfo = {};
-    var originalMap = "";
-    var currentMap = "";
-
 
     var app = angular.module('kityminderDemo', ['kityminderEditor', 'ngWebSocket']);
 
@@ -321,16 +296,7 @@
         };
     });
 
-    $(window).bind('beforeunload', function (e) {
-        if (originalMap !== currentMap) {
-            e = e || window.event;
-            e.returnValue = "Are you really leaving?";
-            return "Are you really leaving?";
-        }
-        else {
-            return;
-        }
-    });
+
 </script>
 
 </html>

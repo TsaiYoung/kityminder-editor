@@ -88,17 +88,12 @@ angular.module('kityminderEditor')
 										if (xhr.status == 200) {
 											var file = xhr.response;
 
-											editor.minder.importData(fileType, file).then(function () {
-												// 初始化原始导图
-												originalMap = JSON.stringify(editor.minder.exportJson());
-											});
+											editor.minder.importData(fileType, file);
 
 											mindmapInfo = {
 												name: map.name,
-												resourceId: map.resourceId,
-												uploaderId: map.uploaderId
-											};
-
+												resourceId: map.resourceId
+											}
 										}
 									};
 									xhr.send();
@@ -109,47 +104,17 @@ angular.module('kityminderEditor')
 							}
 
 						}
-
-						/*** for collaboration * start ***/
-						function getSocketConnect(data) {
-
-							if (data != {}) {
-								if (data.messageType == "Message" && data.event == "contentchange") {
-									var mindmap = JSON.parse(data.value);
-									editor.minder.importJson(mindmap);
-									window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());
-								}
-							}
-						}
+						
 						editor.minder.on('contentchange', function () {
 							// window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());							
 						});
 
 						function contentListening() {
-							currentMap = JSON.stringify(editor.minder.exportJson());
-							if (window.localStorage.__dev_minder_content !== currentMap) {
-								window.localStorage.__dev_minder_content = currentMap;
 
-								if (Messages.isConnection()) {
-									// websocket
-									var socketContent = {
-										"messageType": "Message",
-										"event": "contentchange",
-										"value": window.localStorage.__dev_minder_content
-									}
-									Messages.sendSock("mindmap", socketContent, getSocketConnect);
-								}
+							if (window.localStorage.__dev_minder_content !== JSON.stringify(editor.minder.exportJson())) {
+								window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());								
 							}
 
-							//心跳机制
-							if (Messages.isConnection()) {
-								var socketContent = {
-									"messageType": "Ping",
-									"event": "pong"
-								}
-								Messages.sendSock("ping", socketContent, getSocketConnect);
-
-							}
 						}
 						setInterval(contentListening, 1000);
 						/*** for collaboration * end ***/

@@ -182,8 +182,6 @@ angular.module('kityminderEditor')
 					'save':'Save',
 					
 					'import':'Import',
-					
-					'version':'Version list',
 
 					'expandtoleaf': 'Expand',
 
@@ -194,7 +192,7 @@ angular.module('kityminderEditor')
 
 					'tabs': {
 						'file':'File',
-						'idea': 'Edit',
+						'idea': 'Idea',
 						'appearence': 'Appearence',
 						'view': 'View'
 					},
