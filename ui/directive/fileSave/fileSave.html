@@ -8,39 +8,10 @@
                 <span class="sr-only">{{ 'save' | lang:'ui' }}</span>
         </button>
         <ul class="dropdown-menu" role="menu">
-                <li data-toggle="modal" data-target="#saveModal"><a href>Save (Save to current version)</a></li>
-                <li data-toggle="modal" data-target="#saveasModal"><a href>Save as (Save as a new version)</a></li>
+                <li data-toggle="modal" ng-click="saveMapFun()"><a href>Save (Save to current version)</a></li>
+                <li data-toggle="modal" data-target="#saveasModal"><a href>Save as (Save as a new file)</a></li>
         </ul>
-        <!-- 模态框（Modal） -->
-        <div class="modal fade" id="saveModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                        <div class="modal-content">
-                                <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                                                &times;
-                                        </button>
-                                        <h4 class="modal-title" id="myModalLabel">
-                                                Save mind map
-                                        </h4>
-                                </div>
-                                <div class="modal-body">
-                                        <div style="margin: 10px 0;">
-                                                <button type="button" class="btn btn-info" id="saveBtn"
-                                                        ng-click="saveMapFun()">
-                                                        Save to resource center</button>
-                                                <button style="margin-left: 20px;" type="button" id="downloadBtn"
-                                                        ng-click="downloadMapFun()"
-                                                        class="btn btn-info">Download</button>
-                                        </div>
-                                </div>
-                                <div class="modal-footer">
-                                        <button type="button" class="btn btn-default"
-                                                data-dismiss="modal">Close</button>
-                                </div>
-                        </div>
-                </div>
-        </div>
+        <!-- 模态框（Modal） -->        
         <div class="modal fade" id="saveasModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog">
@@ -69,17 +40,11 @@
                                                 <span class="input-group-addon"> File name: </span>
                                                 <input type="text" class="form-control" id="mindmapName"
                                                         placeholder="Please fill in the name">
-                                        </div>
-                                        <div style="margin-top: 20px;">
-                                                <button type="button" class="btn btn-info" id="saveBtn"
-                                                        ng-click="saveasMapFun()">
-                                                        Save to resource center</button>
-                                                <button style="float: right;" type="button" id="downloadBtn"
-                                                        ng-click="downloadMapFun()"
-                                                        class="btn btn-info">Download</button>
-                                        </div>
+                                        </div>                                        
                                 </div>
                                 <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary"
+                                        data-dismiss="modal" ng-click="saveasMapFun()">Save as</button>
                                         <button type="button" class="btn btn-default"
                                                 data-dismiss="modal">Close</button>
                                 </div>

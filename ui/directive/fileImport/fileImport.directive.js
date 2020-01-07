@@ -12,6 +12,7 @@ angular.module('kityminderEditor')
                 scope.updateMaplist = updateMaplist;
                 scope.mapImport = mapImport;
                 scope.mapLoad = mapLoad;
+                scope.mapDownload = mapDownload;
                 scope.deleteMap = deleteMap;
 
                 function updateMaplist() {
@@ -128,7 +129,7 @@ angular.module('kityminderEditor')
                                     mindmapInfo = {
                                         name: map.name,
                                         resourceId: map.resourceId,
-                                        uploaderId: info.userId
+                                        uploaderId: map.uploaderId
                                     }
                                 }
                             };
@@ -146,6 +147,91 @@ angular.module('kityminderEditor')
                         alert("Missing user information, please log in!");
                     }
                 }
+
+                function mapDownload() {
+
+                    if (mindmapInfo != {} && mindmapInfo.name != undefined && mindmapInfo.name != "") {
+
+                        var datatype = mindmapInfo.name.substring(mindmapInfo.name.lastIndexOf('.') + 1);
+
+                        switch (datatype) {
+                            case 'km':
+                                exportType = 'json';
+                                break;
+                            case 'md':
+                                exportType = 'markdown';
+                                break;
+                            default:
+                                exportType = datatype;
+                                break;
+                        }
+
+                        editor.minder.exportData(exportType).then(function (content) {
+
+                            // 文件下载
+                            if (datatype == "png") {
+                                var arr = content.split(','), mime = arr[0].match(/:(.*?);/)[1],
+                                    bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+                                while (n--) {
+                                    u8arr[n] = bstr.charCodeAt(n);
+                                }
+
+                                var blob = new Blob([u8arr], { type: mime }),
+                                    url = URL.createObjectURL(blob);
+                            }
+                            else {
+                                var blob = new Blob([content]),
+                                    url = URL.createObjectURL(blob);
+                            }
+
+                            var a = document.createElement("a");
+                            a.download = mindmapInfo.name;
+                            a.href = url;
+                            $("body").append(a);
+                            a.click();
+                            $(a).remove();
+                        });
+
+                    } else if ($('#mindmapName').val() != "" && $('#mindmapName').val() != undefined) {
+                        datatype = $('#datatypeSelect').val();
+
+                        switch (datatype) {
+                            case 'km':
+                                exportType = 'json';
+                                break;
+                            case 'md':
+                                exportType = 'markdown';
+                                break;
+                            default:
+                                exportType = datatype;
+                                break;
+                        }
+
+                        editor.minder.exportData(exportType).then(function (content) {
+
+                            // 文件下载
+                            if (datatype == "png") {
+                                var blob = getBlobBydataURI(content);
+                                var url = URL.createObjectURL(blob);
+                            }
+                            else {
+                                var blob = new Blob([content]),
+                                    url = URL.createObjectURL(blob);
+                            }
+
+                            var a = document.createElement("a");
+                            a.download = $('#mindmapName').val() + '.' + datatype;
+                            a.href = url;
+                            $("body").append(a);
+                            a.click();
+                            $(a).remove();
+                        });
+                    }
+                    else {
+                        alert("Please click \"Save as (Save as a new version)\" and fill in the mindmap name, before downloading.");
+                    }
+                }
+
 
                 function deleteMap(map) {
                     try {
@@ -181,6 +267,19 @@ angular.module('kityminderEditor')
                         console.log("fail")
                     }
                 }
+
+                function getBlobBydataURI(dataurl) {
+                    var arr = dataurl.split(","),
+                        mime = arr[0].match(/:(.*?);/)[1],
+                        bstr = atob(arr[1]),
+                        n = bstr.length,
+                        u8arr = new Uint8Array(n);
+                    while (n--) {
+                        u8arr[n] = bstr.charCodeAt(n);
+                    }
+                    return new Blob([u8arr], { type: mime });
+                }
             }
+            
         }
     }]);

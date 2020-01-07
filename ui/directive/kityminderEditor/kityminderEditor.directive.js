@@ -88,15 +88,17 @@ angular.module('kityminderEditor')
 										if (xhr.status == 200) {
 											var file = xhr.response;
 
-											editor.minder.importData(fileType, file);
+											editor.minder.importData(fileType, file).then(function () {
+												// 初始化原始导图
+												originalMap = JSON.stringify(editor.minder.exportJson());
+											});
 
 											mindmapInfo = {
 												name: map.name,
 												resourceId: map.resourceId,
-												uploaderId: info.userId
+												uploaderId: map.uploaderId
 											};
-											// 初始化原始导图
-											originalMap = JSON.stringify(editor.minder.exportJson());
+
 										}
 									};
 									xhr.send();

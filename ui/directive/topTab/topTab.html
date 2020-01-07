@@ -2,6 +2,7 @@
     <tab heading="{{ 'file' | lang: 'ui/tabs'; }}" ng-click="toggleTopTab('file')" select="setCurTab('file')">        
         <file-import minder="minder"></file-import>
         <file-save minder="minder"></file-save>
+        <version-manager minder="minder"></version-manager>
     </tab>
     <tab heading="{{ 'idea' | lang: 'ui/tabs'; }}" ng-click="toggleTopTab('idea')" select="setCurTab('idea')">
         <undo-redo editor="editor"></undo-redo>
