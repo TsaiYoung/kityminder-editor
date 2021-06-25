@@ -79,9 +79,11 @@ angular.module('kityminderEditor')
                         var reader = new FileReader();
                         reader.onload = function (e) {
                             var content = reader.result;
+
+                            $("#loading").show();
                             editor.minder.importData(fileType, content).then(function (data) {
                                 $(fileInput).val('');
-
+                                $("#loading").hide();
                                 // 初始化原始导图
                                 originalMap = JSON.stringify(editor.minder.exportJson());
                             });
@@ -119,9 +121,9 @@ angular.module('kityminderEditor')
                                 if (xhr.status == 200) {
                                     var file = xhr.response;
 
+                                    $("#loading").show();
                                     editor.minder.importData(fileType, file).then(function (data) {
-                                        $(fileInput).val('');
-
+                                        $("#loading").hide();
                                         // 初始化原始导图
                                         originalMap = JSON.stringify(editor.minder.exportJson());
                                     });
@@ -150,6 +152,8 @@ angular.module('kityminderEditor')
 
                 function mapDownload(map) {
                     var a = document.createElement("a");
+                    a.download = map.name;
+                    a.target="_blank";
                     a.href = 'http://' + RouteInfo.getIPPort() + map.pathURL;
                     $("body").append(a);
                     a.click();

@@ -88,7 +88,9 @@ angular.module('kityminderEditor')
 										if (xhr.status == 200) {
 											var file = xhr.response;
 
+											$("#loading").show();
 											editor.minder.importData(fileType, file).then(function () {
+												$("#loading").hide();
 												// 初始化原始导图
 												originalMap = JSON.stringify(editor.minder.exportJson());
 											});

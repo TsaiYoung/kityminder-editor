@@ -1,6 +1,6 @@
 <div class="btn-group-vertical" dropdown is-open="isopen">
         <button type="button" class="btn btn-default save" title="{{ 'save' | lang:'ui' }}"
-                ng-class="{'active': isopen}"></button>
+                ng-class="{'active': isopen}" ng-click="saveMapFun()"></button>
         <button type="button" class="btn btn-default save-caption dropdown-toggle" title="{{ 'save' | lang:'ui' }}"
                 dropdown-toggle>
                 <span class="caption">{{ 'save' | lang:'ui' }}</span>

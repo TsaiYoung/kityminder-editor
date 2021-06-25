@@ -182,6 +182,8 @@ angular.module('kityminderEditor')
 					'save':'Save',
 					
 					'import':'Import',
+
+					'download':'Download',
 					
 					'version':'Version list',
 

@@ -32,9 +32,10 @@ angular.module('kityminderEditor')
                                     }
                                     else if (data.files.length != undefined) {
 
-                                        console.log("success!");
                                         for (var i = data.files.length - 1; i >= 0; i--) {
-                                            if (data.files[i].type == "toolData:Mindmap") {
+                                            
+                                            var datatype = data.files[i].name.substring(data.files[i].name.lastIndexOf('.') + 1);
+                                            if (data.files[i].type == "toolData:Mindmap" && datatype !== "png") {
                                                 maps.push(data.files[i]);
                                             }
                                         }
@@ -82,8 +83,9 @@ angular.module('kityminderEditor')
                                 if (xhr.status == 200) {
                                     var file = xhr.response;
 
+                                    $("#loading").show();
                                     editor.minder.importData(fileType, file).then(function (data) {
-                                        $(fileInput).val('');
+                                        $("#loading").hide();
 
                                         // 初始化原始导图
                                         originalMap = JSON.stringify(editor.minder.exportJson());
@@ -200,7 +202,7 @@ angular.module('kityminderEditor')
                                         var fileBlob = new File([blob], filename);
 
                                         // 工具信息
-                                        var toolInfo = { toolName: "Mind map", toolUrl: "/GeoProblemSolving/Collaborative/Mindmap/mindmap.html" };
+                                        var toolInfo = { toolName: "Mind map", toolUrl: "/GeoProblemSolving/Collaborative/Mindmap/index.html" };
 
                                         // resourceId
                                         var formData = new FormData();
